@@ -18,8 +18,8 @@ sys.path.insert(1, os.path.dirname(sys.path[0]))
 # import the guts
 from mozharness.base.script import BaseScript
 from mozharness.mozilla.googleplay import GooglePlayMixin
-from mozharness.mozilla.storel10n import storel10n
 from mozharness.base.python import VirtualenvMixin
+from mozapkpublisher.storel10n import storel10n
 
 
 class UpdateDescriptionAPK(BaseScript, GooglePlayMixin, VirtualenvMixin):
