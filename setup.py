@@ -23,4 +23,9 @@ setup(
     packages=find_packages(),
     license='MPL2',
     install_requires=requirements,
+    classifiers=(
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+    ),
 )
