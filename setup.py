@@ -21,11 +21,12 @@ setup(
     author_email='release+python@mozilla.com',
     url='https://github.com/mozilla-releng/mozapkpublisher',
     packages=find_packages(),
+    package_data={"": ["version.txt"]},
     license='MPL2',
     install_requires=requirements,
     classifiers=(
-        'Natural Language :: English',
+        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3',
     ),
 )
