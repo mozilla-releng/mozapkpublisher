@@ -21,7 +21,6 @@ setup(
     author_email='release+python@mozilla.com',
     url='https://github.com/mozilla-releng/mozapkpublisher',
     packages=find_packages(),
-    package_data={"": ["version.txt"]},
     license='MPL2',
     install_requires=requirements,
     classifiers=(
