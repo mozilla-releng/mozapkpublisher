@@ -7,6 +7,7 @@ import logging
 from oauth2client import client
 
 from mozapkpublisher import googleplay
+from mozapkpublisher.apk_metadata import extract_metadata_from_apk
 from mozapkpublisher.base import Base
 from mozapkpublisher.exceptions import WrongArgumentGiven
 from mozapkpublisher.storel10n import StoreL10n
@@ -60,62 +61,54 @@ class PushAPK(Base):
         service -- The session to Google play
         apk_files -- The files
         """
-        edit_request = service.edits().insert(body={},
-                                              packageName=self.config.package_name)
-        package_code = googleplay.PACKAGE_NAME_VALUES[self.config.package_name]
-        result = edit_request.execute()
-        edit_id = result['id']
-        # Store all the versions to set the tracks (needs to happen
-        # at the same time
-        versions = []
-
-        # Retrieve the mapping
+        metadata_per_apks = {apk_file.name: extract_metadata_from_apk(apk_file.name) for apk_file in apk_files}
         self.translationMgmt.load_mapping()
 
-        # For each files, upload it
+        edit_id = service.edits().insert(body={}, packageName=self.config.package_name).execute()['id']
+        self._upload_without_committing(service, edit_id, apk_files, metadata_per_apks)
+        self._upload_whats_new_if_possible(service, edit_id, apk_files, metadata_per_apks)
+        self._update_tracks(service, edit_id, metadata_per_apks)
+        self._commit(service, edit_id)
+
+    def _upload_without_committing(self, service, edit_id, apk_files, metadata_per_apks):
         for apk_file in apk_files:
             apk_file_name = apk_file.name
             try:
-                # Upload the file
                 apk_response = service.edits().apks().upload(
                     editId=edit_id,
                     packageName=self.config.package_name,
-                    media_body=apk_file_name).execute()
-                logger.info('Version code %d has been uploaded. '
-                            'Filename "%s" edit_id %s' %
-                            (apk_response['versionCode'], apk_file_name, edit_id))
+                    media_body=apk_file_name
+                ).execute()
+                version_code = self._sanity_check_version_code(metadata_per_apks, apk_file_name, apk_response)
 
-                versions.append(apk_response['versionCode'])
-
-                if 'aurora' in self.config.package_name:
-                    logger.warning('Aurora is not supported by the L10n Store (see \
-https://github.com/mozilla-l10n/stores_l10n/issues/71). Skipping what\'s new.')
-                else:
-                    self._push_whats_new(package_code, service, edit_id, apk_response)
+                logger.info('"{}" (version code: {}) has been transfered to Google Play Store. Nothing will be published \
+until committed'.format(apk_file_name, version_code))
 
             except client.AccessTokenRefreshError:
                 logger.critical('The credentials have been revoked or expired,'
                                 'please re-run the application to re-authorize')
 
-        upload_body = {u'versionCodes': versions}
-        if self.config.rollout_percentage is not None:
-            upload_body[u'userFraction'] = self.config.rollout_percentage / 100
+    def _sanity_check_version_code(self, metadata_per_apks, apk_file_name, play_store_response):
+        apk_version_code = metadata_per_apks[apk_file_name]['version_code']
+        playstore_version_code = play_store_response['versionCode']
 
-        # Set the track for all apk
-        service.edits().tracks().update(
-            editId=edit_id,
-            track=self.config.track,
-            packageName=self.config.package_name,
-            body=upload_body).execute()
-        logger.info('Application "%s" set to track "%s" for versions %s' %
-                    (self.config.package_name, self.config.track, versions))
+        if apk_version_code != playstore_version_code:
+            raise Exception('Google Play reported version code "{}", whereas "{}" was read locally'.format(
+                apk_version_code, playstore_version_code
+            ))
+        return apk_version_code
 
-        # Commit our changes
-        commit_request = service.edits().commit(
-            editId=edit_id, packageName=self.config.package_name).execute()
-        logger.debug('Edit "%s" has been committed' % (commit_request['id']))
+    def _upload_whats_new_if_possible(self, service, edit_id, apk_files, metadata_per_apks):
+        if 'aurora' in self.config.package_name:
+            logger.warning('Aurora is not supported by the L10n Store (see \
+https://github.com/mozilla-l10n/stores_l10n/issues/71). Skipping what\'s new.')
+            return
 
-    def _push_whats_new(self, package_code, service, edit_id, apk_response):
+        for apk_file in apk_files:
+            self._push_whats_new(service, edit_id, version_code=metadata_per_apks[apk_file.name]['version_code'])
+
+    def _push_whats_new(self, service, edit_id, version_code):
+        package_code = googleplay.PACKAGE_NAME_VALUES[self.config.package_name]
         locales = self.translationMgmt.get_list_locales(package_code)
         locales.append(u'en-US')
 
@@ -131,10 +124,36 @@ https://github.com/mozilla-l10n/stores_l10n/issues/71). Skipping what\'s new.')
 
             listing_response = service.edits().apklistings().update(
                 editId=edit_id, packageName=self.config.package_name, language=locale,
-                apkVersionCode=apk_response['versionCode'],
+                apkVersionCode=version_code,
                 body={'recentChanges': whatsnew}).execute()
 
             logger.info('Listing for language %s was updated.' % listing_response['language'])
+
+    def _update_tracks(self, service, edit_id, metadata_per_apks):
+        service.edits().tracks().update(
+            editId=edit_id,
+            track=self.config.track,
+            packageName=self.config.package_name,
+            body=self._craft_upload_body(metadata_per_apks)
+        ).execute()
+
+        logger.info('Package "{}" set versions {} to track(s) {}'.format(
+            self.config.package_name,
+            {apk: metadata['version_code'] for apk, metadata in metadata_per_apks.items()},
+            self.config.track
+        ))
+
+    def _craft_upload_body(self, metadata_per_apks):
+        upload_body = {u'versionCodes': [metadata['version_code'] for metadata in metadata_per_apks.values()]}
+        if self.config.rollout_percentage is not None:
+            upload_body[u'userFraction'] = self.config.rollout_percentage / 100
+        return upload_body
+
+    def _commit(self, service, edit_id):
+        service.edits().commit(
+            editId=edit_id, packageName=self.config.package_name
+        ).execute()
+        logger.info('Changes committed')
 
     def run(self):
         """ Upload the APK files """

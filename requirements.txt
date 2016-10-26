@@ -6,3 +6,5 @@ pyOpenSSL==16.1.0 \
 #    --hash=sha512:e694c2bfec2e3f585b15b47b66eef0de0b10f7c6abdb49ee33f9c7acf1b64aba9d1c08500414c85c2cc5b6d2e0215c127329d38f62de687f8f1b2140e3bd8225
 requests==2.11.1 \
 #    --hash=sha512:9e92419e11ec8b45d0fdf1b4655476c83e20da043a8e23b8d33f29e73eecb82f6bc929ea3c73ccec2d283caec0b721cd349fc76bd925f617df2f7ddfba14e57e
+# TODO before merging PR: 0.0.2 isn't published yet. Waiting on https://github.com/kzjeef/AxmlParserPY/pull/3
+AxmlParserPY==0.0.2
