@@ -15,6 +15,7 @@ def extract_metadata_from_apk(file_name):
     xml_manifest = minidom.parseString(manifest_string_content)
 
     return {
+        'package_name': xml_manifest.documentElement.getAttribute('package'),
         # Google Play uses integers
         'version_code': int(xml_manifest.documentElement.getAttribute('android:versionCode')),
     }

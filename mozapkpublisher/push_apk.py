@@ -62,6 +62,7 @@ class PushAPK(Base):
         apk_files -- The files
         """
         metadata_per_apks = {apk_file.name: extract_metadata_from_apk(apk_file.name) for apk_file in apk_files}
+        self._verify_package_names(metadata_per_apks)
         self.translationMgmt.load_mapping()
 
         edit_id = service.edits().insert(body={}, packageName=self.config.package_name).execute()['id']
@@ -69,6 +70,15 @@ class PushAPK(Base):
         self._upload_whats_new_if_possible(service, edit_id, apk_files, metadata_per_apks)
         self._update_tracks(service, edit_id, metadata_per_apks)
         self._commit(service, edit_id)
+
+    def _verify_package_names(self, metadata_per_apks):
+        for apk, metadata in metadata_per_apks.items():
+            package_name = metadata['package_name']
+            if package_name != self.config.package_name:
+                raise Exception('Metadata for "{}" reads package name "{}", whereas "{}" was specified'.format(
+                    apk, package_name, self.config.package_name
+                ))
+        logger.debug('All packages reference the same package name: {}'.format(self.config.package_name))
 
     def _upload_without_committing(self, service, edit_id, apk_files, metadata_per_apks):
         for apk_file in apk_files:
