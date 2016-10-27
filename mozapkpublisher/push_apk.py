@@ -31,13 +31,13 @@ class PushAPK(Base):
     @classmethod
     def _init_parser(cls):
         cls.parser = ArgumentParser(
-            description="""Upload the apk of a Firefox app on Google play.
+            description='''Upload Firefox for Android APKs onto Google Play Store.
 
-    Example for a beta upload:
+    Example for Firefox for Android Beta:
     $ python push_apk.py --package-name org.mozilla.firefox_beta --track production \
-    --service-account foo@developer.gserviceaccount.com --credentials key.p12 \
-    --apk-x86=/path/to/fennec-XX.0bY.multi.android-i386.apk \
-    --apk-armv7-v15=/path/to/fennec-XX.0bY.multi.android-arm-v15.apk""",
+--service-account foo@developer.gserviceaccount.com --credentials key.p12 \
+--apk-x86=/path/to/fennec-XX.0bY.multi.android-i386.apk \
+--apk-armv7-v15=/path/to/fennec-XX.0bY.multi.android-arm-v15.apk''',
             formatter_class=argparse.RawDescriptionHelpFormatter,
         )
 
