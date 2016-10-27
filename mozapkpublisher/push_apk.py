@@ -49,6 +49,13 @@ stored on Google Play. Use this option if you want to test the script with the s
 
         cls.parser.add_argument('--track', choices=googleplay.TRACK_VALUES, default='alpha',
                                 help='Track on which to upload')
+        cls.parser.add_argument('--untrack-old', action='store_true', default=False,
+                                help='''Unpublish older builds on lower tracks.
+
+Context: The Google Play Developer API does not allow to publish a beta version if there is an alpha version with a
+lower version code. If you want to publish to another higher track and automatically disable from another track,
+toggle this flag on.''')
+
         cls.parser.add_argument('--rollout-percentage', type=int, choices=range(0, 101), metavar='[0-100]',
                                 default=None,
                                 help='The percentage of user who will get the update. Specify only if track is rollout')
@@ -106,8 +113,8 @@ until committed'.format(apk_file_name, version_code))
         playstore_version_code = play_store_response['versionCode']
 
         if apk_version_code != playstore_version_code:
-            raise Exception('Google Play reported version code "{}", whereas "{}" was read locally'.format(
-                apk_version_code, playstore_version_code
+            raise Exception('Google Play reported version code "{}" for "", whereas "{}" was read locally'.format(
+                apk_version_code, apk_file_name, playstore_version_code
             ))
         return apk_version_code
 
@@ -143,22 +150,61 @@ https://github.com/mozilla-l10n/stores_l10n/issues/71). Skipping what\'s new.')
             logger.info('Listing for language %s was updated.' % listing_response['language'])
 
     def _update_tracks(self, service, edit_id, metadata_per_apks):
-        service.edits().tracks().update(
-            editId=edit_id,
-            track=self.config.track,
-            packageName=self.config.package_name,
-            body=self._craft_upload_body(metadata_per_apks)
-        ).execute()
+        tracks_to_update = googleplay.get_lower_to_initial_tracks(self.config.track) if self.config.untrack_old \
+            else [self.config.track]
 
-        logger.info('Package "{}" set versions {} to track(s) {}'.format(
-            self.config.package_name,
-            {apk: metadata['version_code'] for apk, metadata in metadata_per_apks.items()},
-            self.config.track
-        ))
+        for track_name in tracks_to_update:
+            track = service.edits().tracks().get(
+                packageName=self.config.package_name, editId=edit_id, track=track_name
+            ).execute()
 
-    def _craft_upload_body(self, metadata_per_apks):
-        upload_body = {u'versionCodes': [metadata['version_code'] for metadata in metadata_per_apks.values()]}
-        if self.config.rollout_percentage is not None:
+            already_published_version_codes = track['versionCodes']
+
+            if track_name == self.config.track or self._are_published_version_codes_lower(
+                published_version_codes=already_published_version_codes,
+                new_version_codes=self._version_codes_as_list(metadata_per_apks)
+            ):
+                service.edits().tracks().update(
+                    editId=edit_id,
+                    track=track_name,
+                    packageName=self.config.package_name,
+                    body=self._craft_upload_body(track_name, metadata_per_apks)
+                ).execute()
+                logger.info('Track "{}" set to version codes {}'.format(track_name, metadata_per_apks))
+            else:
+                logger.warn(
+                    'Skipping track "{}". It already has more recent version codes ({}) than the local ones: {}'
+                    .format(track_name, already_published_version_codes, metadata_per_apks)
+                )
+
+    def _version_codes_as_list(self, metadata_per_apks):
+        return [metadata['version_code'] for metadata in metadata_per_apks.values()]
+
+    def _are_published_version_codes_lower(self, published_version_codes, new_version_codes):
+        # Google Play doesn't tell what version code is mapped to which architecture. Because this script is meant to
+        # be run against nightlies, we make the assumption that no new version code is smaller than the ones already
+        # published.
+        is_every_published_version_code_lower = all(
+            published_code < new_code
+            for published_code in published_version_codes
+            for new_code in new_version_codes
+        )
+
+        is_every_published_version_code_higher_or_equal = all(
+            published_code >= new_code
+            for published_code in published_version_codes
+            for new_code in new_version_codes
+        )
+
+        if is_every_published_version_code_lower == is_every_published_version_code_higher_or_equal:
+            raise Exception(
+                'Some version codes ({}) are at the same time smaller and bigger than the ones already published ({})'
+                .format(new_version_codes, published_version_codes)
+            )
+
+    def _craft_upload_body(self, track_name, metadata_per_apks):
+        upload_body = {u'versionCodes': self._version_codes_as_list(metadata_per_apks)}
+        if track_name == 'rollout':
             upload_body[u'userFraction'] = self.config.rollout_percentage / 100
         return upload_body
 

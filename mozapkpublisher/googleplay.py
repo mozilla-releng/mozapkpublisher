@@ -17,9 +17,8 @@ import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
 from apiclient.discovery import build
 
-# Google play has currently 3 tracks. Rollout deploys
-# to a limited percentage of users
-TRACK_VALUES = ('production', 'beta', 'alpha', 'rollout')
+# Google play has currently 3 tracks. Rollout deploys to a limited percentage of users.
+TRACK_VALUES = ('production', 'rollout', 'beta', 'alpha')
 
 PACKAGE_NAME_VALUES = {
     'org.mozilla.fennec_aurora': 'aurora',
@@ -54,3 +53,14 @@ def connect(service_account, credentials_file_path):
     service = build('androidpublisher', 'v2', http=http)
 
     return service
+
+
+def get_lower_to_initial_tracks(initial_track):
+    index = TRACK_VALUES.index(initial_track)
+    tracks_sublist = list(TRACK_VALUES[index:])
+    tracks_sublist.reverse()
+
+    if initial_track == 'production':
+        # Rollout is not a real track, and must not be updated if production is being set.
+        tracks_sublist.remove('rollout')
+    return tracks_sublist
