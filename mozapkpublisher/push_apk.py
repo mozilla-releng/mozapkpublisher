@@ -43,8 +43,11 @@ class PushAPK(Base):
 
         googleplay.add_general_google_play_arguments(cls.parser)
 
-        cls.parser.add_argument('--track', choices=googleplay.TRACK_VALUES,
-                                default='alpha',    # We are not using alpha but we default to it to avoid mistake
+        cls.parser.add_argument('--no-commit', dest='should_commit', action='store_false', default=True,
+                                help='''Perform every operation of the transation, except committing. No data will be
+stored on Google Play. Use this option if you want to test the script with the same data more than once.''')
+
+        cls.parser.add_argument('--track', choices=googleplay.TRACK_VALUES, default='alpha',
                                 help='Track on which to upload')
         cls.parser.add_argument('--rollout-percentage', type=int, choices=range(0, 101), metavar='[0-100]',
                                 default=None,
@@ -69,7 +72,7 @@ class PushAPK(Base):
         self._upload_without_committing(service, edit_id, apk_files, metadata_per_apks)
         self._upload_whats_new_if_possible(service, edit_id, apk_files, metadata_per_apks)
         self._update_tracks(service, edit_id, metadata_per_apks)
-        self._commit(service, edit_id)
+        self._commit_if_needed(service, edit_id)
 
     def _verify_package_names(self, metadata_per_apks):
         for apk, metadata in metadata_per_apks.items():
@@ -159,11 +162,14 @@ https://github.com/mozilla-l10n/stores_l10n/issues/71). Skipping what\'s new.')
             upload_body[u'userFraction'] = self.config.rollout_percentage / 100
         return upload_body
 
-    def _commit(self, service, edit_id):
-        service.edits().commit(
-            editId=edit_id, packageName=self.config.package_name
-        ).execute()
-        logger.info('Changes committed')
+    def _commit_if_needed(self, service, edit_id):
+        if self.config.should_commit:
+            service.edits().commit(
+                editId=edit_id, packageName=self.config.package_name
+            ).execute()
+            logger.info('Changes committed')
+        else:
+            logger.warn('No-commit option was given, transaction not committed.')
 
     def run(self):
         """ Upload the APK files """
