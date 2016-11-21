@@ -11,4 +11,4 @@ script:
     - TOX_ENVIRONMENT="py${TRAVIS_PYTHON_VERSION//./}"
     - tox -e "$TOX_ENVIRONMENT"
 after_success:
-    - if [[ $TOX_ENVIRONMENT == 'py35' ]] ; then tox -e py35-coveralls; else echo "No coverage to do"; fi
+    - if [[ $TOX_ENVIRONMENT == 'py27' ]] ; then tox -e py27-coveralls; else echo "No coverage to do"; fi
