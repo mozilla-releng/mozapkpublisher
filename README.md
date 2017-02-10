@@ -2,14 +2,14 @@
 
 Scripts to publish Firefox for Android on Google Play Store.
 
-## Run
+## Setup and run
 
 1. Create a virtualenv and source it
 1. `python setup.py develop`
 1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/update_apk_description.py`
 1. Run `--help` to each of these script to know how to call them.
 
-#### Setup in Mac OSX
+### Setup in Mac OSX
 
 
 1. Install Xcode command line tools
@@ -32,10 +32,24 @@ Scripts to publish Firefox for Android on Google Play Store.
 1. Some errors might happen when executing `mozapkpublisher/push_apk.py`  
     1. You might have errors like  
         * Errors in from_p12_keyfile in oauth2client/service_account.py or
-        * ImportError: cannot import name _openssl_crypt  
+        * ImportError: cannot import name `_openssl_crypt`
             * `pip uninstall oauth2client`  
             * `pip install oauth2client==2.0.0`  
             * `pip install google-api-python-client==1.5.0`  
-    1. Symbol not found: _BIO_new_CMS  
+    1. Symbol not found: `_BIO_new_CMS`
         * `pip uninstall cryptography`  
-        * `LDFLAGS="-L/usr/local/opt/openssl/lib" pip install cryptography --no-use-wheel`  
+        * `LDFLAGS="-L/usr/local/opt/openssl/lib" pip install cryptography --no-use-wheel`
+
+## What to do when pushapk_scriptworker doesn't work?
+
+> A guide to manually publish APKs onto Google Play Store
+
+1. Generate a Google Play Store p12 certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Aurora.
+1. Execute the steps defined in the section above.
+1. Download the latest signed builds. For instance, for Fennec Aurora:
+  * ARM apk:  https://tools.taskcluster.net/index/artifacts/#gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile/gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile.android-api-15-opt
+  * x86 APK:  https://tools.taskcluster.net/index/artifacts/#gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile/gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile.android-x86-opt
+1. `./mozapkpublisher/push_apk.py --package-name org.mozilla.fennec_aurora --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@boxwood-axon-825.iam.gserviceaccount.com --apk-x86 x86.apk  --apk-armv7-v15 arm.apk --dry-run`
+  * Note the `--dry-run` option. This will do everything needed, but commit the transaction.
+  * Even though we're publishing aurora, we use the "beta" track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for aurora, unlike beta and release.
+1. Run the above command, but without `--dry-run`
