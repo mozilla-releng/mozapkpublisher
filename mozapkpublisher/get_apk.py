@@ -66,12 +66,25 @@ class GetAPK(Base):
         except OSError:     # XXX: Used for compatibility with Python 2. Use FileNotFoundError otherwise
             logger.warn('{} was not found. Skipping...'.format(self.download_dir))
 
-    def check_apk(self, apk_file, checksum_file):
-        logger.debug('Checking checksum for "{}"...'.format(apk_file))
+    def _get_file_info(self, checksum_file, apk_file):
+        with open(checksum_file, 'r') as fh:
+            for line in fh.read().splitlines():
+                m = re.match(r"""^(?P<hash>.*) sha512 (?P<filesize>\d+) %s""" % apk_file, line)
+                if m:
+                    gd = m.groupdict()
+                    logger.info("Found hash %(hash)s" % gd)
+                    return gd['hash']
+        # old style pre-53 checksums files
         with open(checksum_file, 'r') as f:
             checksum = f.read()
         checksum = re.sub("\s(.*)", "", checksum.splitlines()[0])
+        logger.info("Found hash %s" % checksum)
+        return checksum
 
+    def check_apk(self, apk_file, checksum_file):
+        logger.debug('Checking checksum for "{}"...'.format(apk_file))
+
+        checksum = self._get_file_info(checksum_file, apk_file)
         apk_checksum = file_sha512sum(apk_file)
 
         if checksum == apk_checksum:
