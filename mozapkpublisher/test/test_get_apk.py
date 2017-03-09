@@ -1,9 +1,10 @@
+import mock
 import os
 import pytest
 import shutil
 from tempfile import mkdtemp
 
-from mozapkpublisher.exceptions import WrongArgumentGiven
+from mozapkpublisher.exceptions import CheckSumMismatch, WrongArgumentGiven
 from mozapkpublisher.get_apk import GetAPK
 
 VALID_CONFIG = {'version': '50.0b8'}
@@ -51,16 +52,24 @@ def test_get_common_file_name():
     assert get_apk.get_common_file_name('51.0a2', 'en-US') == 'fennec-51.0a2.en-US.android-'
 
 
-@pytest.mark.parametrize('checksum_file', (
-    os.path.join(os.path.dirname(__file__), 'data', 'checksums.old'),
-    os.path.join(os.path.dirname(__file__), 'data', 'checksums.tc'),
-))
-def test_check_apk(checksum_file):
+@pytest.mark.parametrize('checksum_file,raises', ((
+    os.path.join(os.path.dirname(__file__), 'data', 'checksums.old'), False,
+), (
+    os.path.join(os.path.dirname(__file__), 'data', 'checksums.tc'), False,
+), (
+    os.path.join(os.path.dirname(__file__), 'data', 'checksums.broken'), True,
+)))
+def test_check_apk(checksum_file, raises):
     try:
         # check_apk nukes the checksum file, so make a copy first
         temp_dir = mkdtemp()
         cfile = os.path.join(temp_dir, os.path.basename(checksum_file))
         shutil.copyfile(checksum_file, cfile)
-        assert get_apk.check_apk(CHECKSUM_APK, cfile) is None
+        with mock.patch.object(shutil, 'rmtree'):
+            if raises:
+                with pytest.raises(CheckSumMismatch):
+                    get_apk.check_apk(CHECKSUM_APK, cfile)
+            else:
+                assert get_apk.check_apk(CHECKSUM_APK, cfile) is None
     finally:
         shutil.rmtree(temp_dir)
