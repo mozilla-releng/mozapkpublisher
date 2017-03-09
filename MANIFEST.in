@@ -1,3 +1,5 @@
+recursive-include mozapkpublisher/test/data *
+
 include README.md
 include version.txt
 include requirements*.txt
