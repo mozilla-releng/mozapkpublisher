@@ -5,6 +5,7 @@ Scripts to publish Firefox for Android on Google Play Store.
 ## Setup and run
 
 1. Create a virtualenv and source it
+1. `pip install -r requirements.txt`
 1. `python setup.py develop`
 1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/update_apk_description.py`
 1. Run `--help` to each of these script to know how to call them.
@@ -15,6 +16,7 @@ Scripts to publish Firefox for Android on Google Play Store.
 1. Install Xcode command line tools
    `xcode-select --install`
 1. Create a virtualenv and source it
+1. `pip install -r requirements.txt`
 1. Some errors might happen during `python setup.py develop`
     1. fatal error: 'openssl/opensslv.h' file not found
         1. Temporarily adjust permissions on /usr/local so brew can update:  
