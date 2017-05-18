@@ -159,10 +159,10 @@ def check_apk_against_checksum_file(apk_file, checksum_file):
 
 
 def _fetch_checksum_from_file(checksum_file, apk_file):
-    base_apk_filename = os.path.basename(apk_file)
+    base_apk_filepath = _take_out_common_path(checksum_file, apk_file)
     with open(checksum_file, 'r') as fh:
         for line in fh:
-            m = re.match(r"""^(?P<hash>.*) sha512 (?P<filesize>\d+) {}""".format(base_apk_filename), line)
+            m = re.match(r"""^(?P<hash>.*) sha512 (?P<filesize>\d+) {}""".format(base_apk_filepath), line)
             if m:
                 gd = m.groupdict()
                 logger.info("Found hash {}".format(gd['hash']))
@@ -173,6 +173,18 @@ def _fetch_checksum_from_file(checksum_file, apk_file):
     checksum = re.sub("\s(.*)", "", checksum.splitlines()[0])
     logger.info("Found hash {}".format(checksum))
     return checksum
+
+
+def _take_out_common_path(checksum_file, apk_file):
+    try:
+        common_prefix = os.path.commonpath((checksum_file, apk_file))  # Only exists in Python 3.5+
+    except AttributeError:
+        common_prefix = os.path.dirname(checksum_file)
+
+    if common_prefix[-1] != '/':
+        common_prefix = '{}/'.format(common_prefix)
+
+    return apk_file.replace(common_prefix, '')
 
 
 if __name__ == '__main__':
