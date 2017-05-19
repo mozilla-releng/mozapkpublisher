@@ -176,15 +176,7 @@ def _fetch_checksum_from_file(checksum_file, apk_file):
 
 
 def _take_out_common_path(checksum_file, apk_file):
-    try:
-        common_prefix = os.path.commonpath((checksum_file, apk_file))  # Only exists in Python 3.5+
-    except AttributeError:
-        common_prefix = os.path.dirname(checksum_file)
-
-    if common_prefix[-1] != '/':
-        common_prefix = '{}/'.format(common_prefix)
-
-    return apk_file.replace(common_prefix, '')
+    return os.path.relpath(apk_file, os.path.dirname(checksum_file))
 
 
 if __name__ == '__main__':
