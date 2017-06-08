@@ -5,6 +5,8 @@ Scripts to publish Firefox for Android on Google Play Store.
 ## Setup and run
 
 1. Create a virtualenv and source it
+   `virtualenv venv`
+   `source venv/bin/activate`
 1. `pip install -r requirements.txt`
 1. `python setup.py develop`
 1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/update_apk_description.py`
