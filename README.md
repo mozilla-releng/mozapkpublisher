@@ -5,8 +5,10 @@ Scripts to publish Firefox for Android on Google Play Store.
 ## Setup and run
 
 1. Create a virtualenv and source it
-   ```virtualenv venv```
-   ```source venv/bin/activate```
+```sh
+virtualenv venv
+source venv/bin/activate
+```
 1. `pip install -r requirements.txt`
 1. `python setup.py develop`
 1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/update_apk_description.py`
@@ -48,12 +50,15 @@ Scripts to publish Firefox for Android on Google Play Store.
 
 > A guide to manually publish APKs onto Google Play Store
 
-1. Generate a Google Play Store p12 certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Aurora.
+1. Generate a Google Play Store p12 certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Nightly.
 1. Execute the steps defined in the section above.
-1. Download the latest signed builds. For instance, for Fennec Aurora:
-  * ARM apk:  https://tools.taskcluster.net/index/artifacts/#gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile/gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile.android-api-15-opt
-  * x86 APK:  https://tools.taskcluster.net/index/artifacts/#gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile/gecko.v2.mozilla-aurora.signed-nightly.nightly.latest.mobile.android-x86-opt
-1. `./mozapkpublisher/push_apk.py --package-name org.mozilla.fennec_aurora --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@boxwood-axon-825.iam.gserviceaccount.com --apk-x86 x86.apk  --apk-armv7-v15 arm.apk --dry-run`
+1. Download the latest signed builds. For instance, for Fennec Nightly: `./mozapkpublisher/get_apk.py --latest-nightly`
+1. 
+```sh
+./mozapkpublisher/push_apk.py --package-name org.mozilla.fennec_aurora --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@iam.gserviceaccount.com --apk-x86 x86.apk  --apk-armv7-v15 arm.apk --dry-run
+```
+
   * Note the `--dry-run` option. This will do everything needed, but commit the transaction.
-  * Even though we're publishing aurora, we use the "beta" track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for aurora, unlike beta and release.
+  * Note `org.mozilla.fennec_aurora`, even though we're publishing Nightly. This is because of [Bug 1354821](https://bugzilla.mozilla.org/show_bug.cgi?id=1354821)
+  * Note `beta` track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for Nightly, unlike beta and release.
 1. Run the above command, but without `--dry-run`
