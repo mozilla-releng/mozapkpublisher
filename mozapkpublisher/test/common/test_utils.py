@@ -1,8 +1,5 @@
-import itertools
-import pytest
 import requests
 import requests_mock
-import sys
 import tempfile
 
 try:
