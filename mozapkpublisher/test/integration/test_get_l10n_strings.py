@@ -12,7 +12,7 @@ from mozapkpublisher.common.store_l10n import STORE_PRODUCT_DETAILS_PER_PACKAGE_
 @pytest.mark.skipif(strtobool(os.environ.get('SKIP_NETWORK_TESTS', 'true')), reason='Tests requiring network are skipped')
 @pytest.mark.parametrize('package_name', STORE_PRODUCT_DETAILS_PER_PACKAGE_NAME.keys())
 def test_download_files(package_name):
-    with tempfile.NamedTemporaryFile('w+t') as f:
+    with tempfile.NamedTemporaryFile('w+t', encoding='utf-8') as f:
         config = {
             'package_name': package_name,
             'output_file': f.name,
