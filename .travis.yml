@@ -2,8 +2,8 @@ sudo: false
 
 language: python
 python:
+  - "3.6"
   - "3.5"
-  - "2.7"
 
 env:
  - SKIP_NETWORK_TESTS=0
@@ -14,4 +14,4 @@ script:
     - TOX_ENVIRONMENT="py${TRAVIS_PYTHON_VERSION//./}"
     - tox -e "$TOX_ENVIRONMENT"
 after_success:
-    - if [[ $TOX_ENVIRONMENT == 'py27' ]] ; then tox -e py27-coveralls; else echo "No coverage to do"; fi
+    - if [[ $TOX_ENVIRONMENT == 'py36' ]] ; then tox -e py36-coveralls; else echo "No coverage to do"; fi
