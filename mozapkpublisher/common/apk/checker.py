@@ -1,7 +1,7 @@
 import logging
 import re
 
-from mozapkpublisher.common.exceptions import BadApk, NotMultiLocaleApk
+from mozapkpublisher.common.exceptions import BadApk, BadSetOfApks, NotMultiLocaleApk
 from mozapkpublisher.common.utils import filter_out_identical_values
 
 logger = logging.getLogger(__name__)
@@ -95,9 +95,9 @@ def _check_piece_of_metadata_is_unique(apks_metadata_per_paths, key, pretty_key)
     unique_items = filter_out_identical_values(all_items)
 
     if not unique_items:
-        raise BadApk("No {} found")
+        raise BadSetOfApks('No {} found')
     if len(unique_items) > 1:
-        raise BadApk("APKs don't have the same {0}. {0} found: {1}".format(pretty_key, unique_items))
+        raise BadSetOfApks("APKs don't have the same {0}. {0} found: {1}".format(pretty_key, unique_items))
 
     logger.info('All APKs have the same {}: {}'.format(pretty_key, unique_items[0]))
 
@@ -109,7 +109,7 @@ def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
     }
 
     if len(architectures_per_version_code) != len(apks_metadata_per_paths):
-        raise BadApk('Some APKs are sharing the same version code! APKs metadata: {}'.format(
+        raise BadSetOfApks('Some APKs are sharing the same version code! APKs metadata: {}'.format(
             apks_metadata_per_paths
         ))
 
@@ -119,7 +119,7 @@ def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
     ])
 
     if sorted_architectures_per_version_code != _ARCHITECTURE_ORDER_REGARDING_VERSION_CODE:
-        raise Exception(
+        raise BadSetOfApks(
             'APKs version code are not correctly ordered. Expected order: {}. Order found: {}. APKs metadata: {}'.format(
                 _ARCHITECTURE_ORDER_REGARDING_VERSION_CODE, sorted_architectures_per_version_code, apks_metadata_per_paths
             )
@@ -129,6 +129,10 @@ def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
 def _check_all_apks_are_multi_locales(apks_metadata_per_paths):
     for path, metadata in apks_metadata_per_paths.items():
         locales = metadata['locales']
+
+        if not isinstance(locales, tuple):
+            raise BadApk('Locale list is not either a tuple. "{}" has: {}'.format(path, locales))
+
         number_of_locales = len(locales)
 
         if number_of_locales <= 1:
@@ -149,14 +153,15 @@ def _check_all_architectures_and_api_levels_are_present(apks_metadata_per_paths)
     ])
 
     missing_combos = expected_combos - current_combos
+    print(expected_combos, current_combos, missing_combos)
     if missing_combos:
-        raise Exception('One or several APKs are missing for Firefox {}: {}'.format(
+        raise BadSetOfApks('One or several APKs are missing for Firefox {}: {}'.format(
             firefox_version, _craft_combos_pretty_names(missing_combos)
         ))
 
     extra_combos = current_combos - expected_combos
     if extra_combos:
-        raise Exception('One or several APKs are not allowed for Firefox {}: {}.\
+        raise BadSetOfApks('One or several APKs are not allowed for Firefox {}: {}. \
 Please make sure mozapkpublisher has allowed them to be uploaded.'.format(
             firefox_version, _craft_combos_pretty_names(extra_combos)
         ))
@@ -173,11 +178,11 @@ def _get_expected_architectures_for_version(firefox_version):
 
 
 def _get_expected_things_for_version(firefox_version, dict_of_things, thing_name):
-    things = [
+    things = tuple(sorted([
         thing
         for thing, range_dict in dict_of_things.items()
         if _is_firefox_version_in_range(firefox_version, range_dict)
-    ]
+    ]))
 
     if not things:
         raise Exception('No {0} found for Firefox version {1}. Current rules for {0}: {2}'.format(

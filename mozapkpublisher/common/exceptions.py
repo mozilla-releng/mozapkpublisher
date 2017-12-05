@@ -46,6 +46,10 @@ class BadApk(LoggedError):
     pass
 
 
+class BadSetOfApks(LoggedError):
+    pass
+
+
 class NoTranslationGiven(LoggedError):
     def __init__(self, given_translations):
         super(NoTranslationGiven, self).__init__(
