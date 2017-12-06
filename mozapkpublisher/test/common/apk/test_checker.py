@@ -165,14 +165,14 @@ def test_check_all_apks_have_the_same_locales():
 
 
 def test_check_piece_of_metadata_is_unique():
-    _check_piece_of_metadata_is_unique({
+    _check_piece_of_metadata_is_unique('some_key', 'Some Key', {
         'irrelevant_key': {
             'some_key': 'some unique value',
         },
         'another_irrelevant_key': {
             'some_key': 'some unique value',
         },
-    }, 'some_key', 'Some Key')
+    })
 
 
 @pytest.mark.parametrize('apks_metadata_per_paths', ({
@@ -187,7 +187,7 @@ def test_check_piece_of_metadata_is_unique():
 }))
 def test_bad_check_piece_of_metadata_is_unique(apks_metadata_per_paths):
     with pytest.raises(BadSetOfApks):
-        _check_piece_of_metadata_is_unique(apks_metadata_per_paths, 'some_key', 'Some Key')
+        _check_piece_of_metadata_is_unique('some_key', 'Some Key', apks_metadata_per_paths)
 
 
 def test_check_apks_version_codes_are_correctly_ordered():

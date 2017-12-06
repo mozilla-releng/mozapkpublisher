@@ -1,6 +1,8 @@
 import logging
 import re
 
+from functools import partial
+
 from mozapkpublisher.common.exceptions import BadApk, BadSetOfApks, NotMultiLocaleApk
 from mozapkpublisher.common.utils import filter_out_identical_values
 
@@ -66,31 +68,7 @@ def cross_check_apks(apks_metadata_per_paths):
     logger.info('APKs are sane!')
 
 
-def _check_all_apks_have_the_same_package_name(apks_metadata_per_paths):
-    _check_piece_of_metadata_is_unique(apks_metadata_per_paths, 'package_name', 'package name')
-
-
-def _check_all_apks_have_the_same_version(apks_metadata_per_paths):
-    _check_piece_of_metadata_is_unique(apks_metadata_per_paths, 'firefox_version', 'Firefox version')
-
-
-def _check_version_matches_package_name(version, package_name):
-    regex = _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME[package_name]
-    if regex.match(version) is None:
-        raise BadApk('Wrong version number "{}" for package name "{}"'.format(version, package_name))
-
-    logger.info('Firefox version "{}" matches package name "{}"'.format(version, package_name))
-
-
-def _check_all_apks_have_the_same_build_id(apks_metadata_per_paths):
-    _check_piece_of_metadata_is_unique(apks_metadata_per_paths, 'firefox_build_id', 'Firefox BuildID')
-
-
-def _check_all_apks_have_the_same_locales(apks_metadata_per_paths):
-    _check_piece_of_metadata_is_unique(apks_metadata_per_paths, 'locales', 'locales')
-
-
-def _check_piece_of_metadata_is_unique(apks_metadata_per_paths, key, pretty_key):
+def _check_piece_of_metadata_is_unique(key, pretty_key, apks_metadata_per_paths):
     all_items = [metadata[key] for metadata in apks_metadata_per_paths.values()]
     unique_items = filter_out_identical_values(all_items)
 
@@ -100,6 +78,20 @@ def _check_piece_of_metadata_is_unique(apks_metadata_per_paths, key, pretty_key)
         raise BadSetOfApks("APKs don't have the same {0}. {0} found: {1}".format(pretty_key, unique_items))
 
     logger.info('All APKs have the same {}: {}'.format(pretty_key, unique_items[0]))
+
+
+_check_all_apks_have_the_same_package_name = partial(_check_piece_of_metadata_is_unique, 'package_name', 'package name')
+_check_all_apks_have_the_same_version = partial(_check_piece_of_metadata_is_unique, 'firefox_version', 'Firefox version')
+_check_all_apks_have_the_same_build_id = partial(_check_piece_of_metadata_is_unique, 'firefox_build_id', 'Firefox BuildID')
+_check_all_apks_have_the_same_locales = partial(_check_piece_of_metadata_is_unique, 'locales', 'locales')
+
+
+def _check_version_matches_package_name(version, package_name):
+    regex = _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME[package_name]
+    if regex.match(version) is None:
+        raise BadApk('Wrong version number "{}" for package name "{}"'.format(version, package_name))
+
+    logger.info('Firefox version "{}" matches package name "{}"'.format(version, package_name))
 
 
 def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
