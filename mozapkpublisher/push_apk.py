@@ -75,7 +75,6 @@ class PushAPK(Base):
             apk_path: extractor.extract_metadata(apk_path)
             for apk_path in apks_paths
         }
-        print(apks_metadata_per_paths)
 
         checker.cross_check_apks(apks_metadata_per_paths)
         package_name = list(apks_metadata_per_paths.values())[0]['package_name']

@@ -145,7 +145,6 @@ def _check_all_architectures_and_api_levels_are_present(apks_metadata_per_paths)
     ])
 
     missing_combos = expected_combos - current_combos
-    print(expected_combos, current_combos, missing_combos)
     if missing_combos:
         raise BadSetOfApks('One or several APKs are missing for Firefox {}: {}'.format(
             firefox_version, _craft_combos_pretty_names(missing_combos)
