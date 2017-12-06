@@ -3,7 +3,7 @@ import re
 import shutil
 import tempfile
 
-from androguard.core.bytecodes.apk import APK as AndroguardAPK
+from androguard.core.bytecodes import apk as androguard
 from io import BytesIO
 from zipfile import ZipFile
 
@@ -11,10 +11,7 @@ from zipfile import ZipFile
 from mozapkpublisher.common.exceptions import BadApk, NoLocaleFound
 from mozapkpublisher.common.utils import filter_out_identical_values
 
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 
 logger = logging.getLogger(__name__)
@@ -43,7 +40,7 @@ def extract_metadata(original_apk_path):
             metadata['firefox_build_id'] = _extract_firefox_build_id(apk_zip)
             metadata['locales'] = _extract_locales(apk_zip)
 
-        androguard_apk = AndroguardAPK(apk_copy.name, mode='r')
+        androguard_apk = androguard.APK(apk_copy.name, mode='r')
         metadata['package_name'] = androguard_apk.get_package()
         metadata['api_level'] = int(androguard_apk.get_min_sdk_version())
         metadata['version_code'] = androguard_apk.get_androidversion_code()
@@ -51,7 +48,7 @@ def extract_metadata(original_apk_path):
     return metadata
 
 
-def _extract_architecture(apk_zip, apk_path):
+def _extract_architecture(apk_zip, original_apk_path):
     files_with_architecture_in_path = [
         file_info.filename for file_info in apk_zip.infolist()
         if _DIRECTORY_WITH_ARCHITECTURE_METADATA in file_info.filename
@@ -59,9 +56,9 @@ def _extract_architecture(apk_zip, apk_path):
 
     if not files_with_architecture_in_path:
         raise BadApk('"{}" does not contain a directory called "{}"'
-                     .format(apk_path, _DIRECTORY_WITH_ARCHITECTURE_METADATA))
+                     .format(original_apk_path, _DIRECTORY_WITH_ARCHITECTURE_METADATA))
 
-    return _extract_architecture_from_paths(apk_path, files_with_architecture_in_path)
+    return _extract_architecture_from_paths(original_apk_path, files_with_architecture_in_path)
 
 
 def _extract_architecture_from_paths(apk_path, paths):
