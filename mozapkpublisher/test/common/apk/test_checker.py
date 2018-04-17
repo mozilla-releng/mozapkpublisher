@@ -97,8 +97,7 @@ def test_check_all_apks_have_the_same_version():
 @pytest.mark.parametrize('version, package_name', (
     ('57.0', 'org.mozilla.firefox'),
     ('57.0.1', 'org.mozilla.firefox'),
-    ('58.0b1', 'org.mozilla.firefox_beta'),
-    ('58.0b10', 'org.mozilla.firefox_beta'),
+    ('58.0', 'org.mozilla.firefox_beta'),   # XXX Betas APKs are shipped without "bY"
     ('59.0a1', 'org.mozilla.fennec_aurora'),
 ))
 def test_check_version_matches_package_name(version, package_name):
@@ -106,14 +105,10 @@ def test_check_version_matches_package_name(version, package_name):
 
 
 @pytest.mark.parametrize('version, package_name', (
-    ('57.0', 'org.mozilla.firefox_beta'),
     ('57.0', 'org.mozilla.fennec_aurora'),
     ('57.0.1', 'org.mozilla.firefox_beta'),
     ('57.0.1', 'org.mozilla.fennec_aurora'),
-    ('58.0b1', 'org.mozilla.firefox'),
-    ('58.0b1', 'org.mozilla.fennec_aurora'),
-    ('58.0b10', 'org.mozilla.firefox'),
-    ('58.0b10', 'org.mozilla.fennec_aurora'),
+    ('58.0', 'org.mozilla.fennec_aurora'),
     ('59.0a1', 'org.mozilla.firefox'),
     ('59.0a1', 'org.mozilla.firefox_beta'),
 ))

@@ -33,7 +33,8 @@ _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME = {
     # Due to project Dawn, Nightly is now using the Aurora package name.
     # See https://bugzilla.mozilla.org/show_bug.cgi?id=1357351
     'org.mozilla.fennec_aurora': re.compile(r'^\d+\.0a1$'),
-    'org.mozilla.firefox_beta': re.compile(r'^\d+\.0b\d+$'),
+    # XXX Betas aren't following the regular XX.0bY format. Instead they follow XX.0.
+    'org.mozilla.firefox_beta': re.compile(r'^\d+\.0$'),
     # Simplified regex. We don't need something as complex as
     # https://github.com/mozilla-releng/ship-it/blob/890929b0c3e6df1b72489d2f3cf60450b91114f2/kickoff/static/model/release.js#L4
     # because we just want to check that 56.0b1 is not shipped with
