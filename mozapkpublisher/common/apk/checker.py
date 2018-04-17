@@ -113,10 +113,12 @@ def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
 
     if sorted_architectures_per_version_code != _ARCHITECTURE_ORDER_REGARDING_VERSION_CODE:
         raise BadSetOfApks(
-            'APKs version code are not correctly ordered. Expected order: {}. Order found: {}. APKs metadata: {}'.format(
+            'APKs version codes are not correctly ordered. Expected order: {}. Order found: {}. APKs metadata: {}'.format(
                 _ARCHITECTURE_ORDER_REGARDING_VERSION_CODE, sorted_architectures_per_version_code, apks_metadata_per_paths
             )
         )
+
+    logger.info('APKs version codes are correctly ordered: {}'.format(architectures_per_version_code))
 
 
 def _check_all_apks_are_multi_locales(apks_metadata_per_paths):
