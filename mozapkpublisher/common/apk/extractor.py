@@ -40,7 +40,7 @@ def extract_metadata(original_apk_path):
             metadata['firefox_build_id'] = _extract_firefox_build_id(apk_zip)
             metadata['locales'] = _extract_locales(apk_zip)
 
-        androguard_apk = androguard.APK(apk_copy.name, mode='r')
+        androguard_apk = androguard.APK(apk_copy.name)
         metadata['package_name'] = androguard_apk.get_package()
         metadata['api_level'] = int(androguard_apk.get_min_sdk_version())
         metadata['version_code'] = androguard_apk.get_androidversion_code()

@@ -86,7 +86,7 @@ def test_extract_metadata(monkeypatch):
     androguard_mock.get_package = lambda: 'org.mozilla.firefox'
     androguard_mock.get_min_sdk_version = lambda: 16
     androguard_mock.get_androidversion_code = lambda: '2015523300'
-    monkeypatch.setattr(androguard, 'APK', lambda _, mode: androguard_mock)
+    monkeypatch.setattr(androguard, 'APK', lambda _: androguard_mock)
 
     with TemporaryDirectory() as temp_dir:
         apk_file = _create_apk_with_all_metadata(temp_dir)

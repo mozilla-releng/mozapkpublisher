@@ -3,4 +3,4 @@ oauth2client
 pyOpenSSL
 requests
 voluptuous
-ak-androguard
+androguard
