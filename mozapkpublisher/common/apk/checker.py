@@ -30,8 +30,7 @@ _MAJOR_FIREFOX_VERSIONS_PER_ARCHITECTURE = {
 }
 
 _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME = {
-    # Due to project Dawn, Nightly is now using the Aurora package name.
-    # See https://bugzilla.mozilla.org/show_bug.cgi?id=1357351
+    # Due to project Dawn, Nightly is now using the Aurora package name. See bug 1357351.
     'org.mozilla.fennec_aurora': re.compile(r'^\d+\.0a1$'),
     # XXX Betas aren't following the regular XX.0bY format. Instead they follow XX.0.
     'org.mozilla.firefox_beta': re.compile(r'^\d+\.0$'),
@@ -42,8 +41,7 @@ _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME = {
     'org.mozilla.firefox': re.compile(r'^\d+\.\d+(\.\d+)?$'),
 }
 
-# x86 must have the highest version code.
-# See https://bugzilla.mozilla.org/show_bug.cgi?id=1338477 for more context
+# x86 must have the highest version code. See bug 1338477 for more context.
 # TODO: Support ARM64, once bug 1368484 is ready
 _ARCHITECTURE_ORDER_REGARDING_VERSION_CODE = ('armeabi-v7a', 'x86')
 
@@ -76,7 +74,7 @@ def _check_piece_of_metadata_is_unique(key, pretty_key, apks_metadata_per_paths)
     if not unique_items:
         raise BadSetOfApks('No {} found')
     if len(unique_items) > 1:
-        raise BadSetOfApks("APKs don't have the same {0}. {0} found: {1}".format(pretty_key, unique_items))
+        raise BadSetOfApks("APKs don't have the same {}. Found: {}".format(pretty_key, unique_items))
 
     logger.info('All APKs have the same {}: {}'.format(pretty_key, unique_items[0]))
 
