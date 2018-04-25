@@ -1,6 +1,8 @@
 import pytest
 
-from mozapkpublisher.common.apk.checker import cross_check_apks, _check_all_apks_have_the_same_package_name, \
+from mozapkpublisher.common.apk.checker import cross_check_apks, cross_check_fennec_apks, \
+    _check_number_of_apks, _check_correct_apk_product_types, _check_piece_of_metadata_is_distinct, \
+    _check_all_apks_have_the_same_package_name, \
     _check_all_apks_have_the_same_version, _check_version_matches_package_name, \
     _check_all_apks_have_the_same_build_id, _check_all_apks_have_the_same_locales, \
     _check_piece_of_metadata_is_unique, _check_apks_version_codes_are_correctly_ordered, \
@@ -8,6 +10,7 @@ from mozapkpublisher.common.apk.checker import cross_check_apks, _check_all_apks
     _get_expected_api_levels_for_version, _get_expected_architectures_for_version, \
     _get_expected_things_for_version, _craft_expected_combos, _is_firefox_version_in_range, \
     _get_firefox_major_version_number, _craft_combos_pretty_names
+from mozapkpublisher.common.utils import PRODUCT
 from mozapkpublisher.common.exceptions import NotMultiLocaleApk, BadApk, BadSetOfApks
 
 
@@ -50,6 +53,51 @@ def test_cross_check_apks():
             'version_code': '2015523300',
         },
     })
+    cross_check_apks({
+        'Focus.apk': {
+            'api_level': 21,
+            'architecture': 'armeabi-v7',
+            'package_name': 'org.mozilla.focus',
+            'version_code': '11'
+        },
+        'Klar.apk': {
+            'api_level': 21,
+            'architecture': 'armeabi-v7',
+            'package_name': 'org.mozilla.klar',
+            'version_code': '11'
+        }
+    })
+
+
+def test_check_number_of_apks():
+    _check_number_of_apks({ 'focus.apk': {}, 'klar.apk': {} }, 2)
+
+    with pytest.raises(BadSetOfApks):
+        _check_number_of_apks({
+            'focus.apk': {},
+            'focus-extra.apk': {},
+            'klar.apk': {}
+        }, 2)
+
+def test_check_correct_apk_product_types():
+    _check_correct_apk_product_types({
+        'focus.apk': {
+            'package_name': 'org.mozilla.focus'
+        },
+        'klar.apk': {
+            'package_name': 'org.mozilla.klar'
+        }
+    }, [ PRODUCT.FOCUS, PRODUCT.KLAR ])
+
+    with pytest.raises(BadSetOfApks):
+        _check_correct_apk_product_types({
+            'fennec.apk': {
+                'package_name': 'org.mozilla.firefox'
+            },
+            'klar.apk': {
+                'package_name': 'org.mozilla.klar'
+            }
+        }, [ PRODUCT.FOCUS, PRODUCT.KLAR ])
 
 
 def test_check_all_apks_have_the_same_package_name():
@@ -169,6 +217,26 @@ def test_check_piece_of_metadata_is_unique():
         },
     })
 
+
+def test_check_piece_of_metadata_is_distinct():
+    _check_piece_of_metadata_is_distinct('some_key', 'Some Key', {
+        'irrelevant_key': {
+            'some_key': 'some value 1',
+        },
+        'another_irrelevant_key': {
+            'some_key': 'some value 2',
+        },
+    })
+
+    with pytest.raises(BadSetOfApks):
+        _check_piece_of_metadata_is_distinct('some_key', 'Some Key', {
+                'irrelevant_key': {
+                    'some_key': 'some value 1',
+                },
+                'another_irrelevant_key': {
+                    'some_key': 'some value 1',
+                },
+            })
 
 @pytest.mark.parametrize('apks_metadata_per_paths', ({
     'irrelevant_key': {
