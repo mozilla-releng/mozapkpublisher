@@ -99,7 +99,7 @@ def _check_piece_of_metadata_is_distinct(key, pretty_key, apks_metadata_per_path
     unique_items = filter_out_identical_values(all_items)
 
     if not unique_items:
-        raise BadSetOfApks('No {} found')
+        raise BadSetOfApks('No {} found'.format(key))
     if len(unique_items) != len(all_items):
         raise BadSetOfApks("APKs share {}. Only found: {}".format(pretty_key, unique_items))
 
@@ -111,7 +111,7 @@ def _check_piece_of_metadata_is_unique(key, pretty_key, apks_metadata_per_paths)
     unique_items = filter_out_identical_values(all_items)
 
     if not unique_items:
-        raise BadSetOfApks('No {} found')
+        raise BadSetOfApks('No {} found'.format(key))
     if len(unique_items) > 1:
         raise BadSetOfApks("APKs don't have the same {}. Found: {}".format(pretty_key, unique_items))
 

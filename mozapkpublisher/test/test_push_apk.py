@@ -11,7 +11,7 @@ from mozapkpublisher.common import googleplay, store_l10n
 from mozapkpublisher.common.apk import checker, extractor
 from mozapkpublisher.common.exceptions import WrongArgumentGiven
 from mozapkpublisher.push_apk import PushAPK, main, _create_or_update_whats_new, \
-    _get_ordered_version_codes, _get_distinct_package_name_apk_metadata
+    _get_ordered_version_codes, _split_apk_metadata_per_package_name
 from mozapkpublisher.test.common.test_store_l10n import set_translations_per_google_play_locale_code, \
     DUMMY_TRANSLATIONS_PER_GOOGLE_PLAY_LOCALE
 
@@ -227,8 +227,16 @@ def test_get_distinct_package_name_apk_metadata():
         'fennec-2.apk': {'package_name': 'org.mozilla.firefox'}
     }
 
-    one_metadata = _get_distinct_package_name_apk_metadata(one_package_apks_metadata)
-    assert len(one_metadata.keys()) == 1
+    expected_one_package_metadata = {
+        'org.mozilla.firefox': {
+            'fennec-1.apk': {'package_name': 'org.mozilla.firefox'},
+            'fennec-2.apk': {'package_name': 'org.mozilla.firefox'}
+        }
+    }
+
+    one_package_metadata = _split_apk_metadata_per_package_name(one_package_apks_metadata)
+    assert len(one_package_metadata.keys()) == 1
+    assert expected_one_package_metadata == one_package_metadata
 
     two_package_apks_metadata = {
         'focus-1.apk': {'package_name': 'org.mozilla.focus'},
@@ -236,8 +244,19 @@ def test_get_distinct_package_name_apk_metadata():
         'klar.apk': {'package_name': 'org.mozilla.klar'}
     }
 
-    two_metadata = _get_distinct_package_name_apk_metadata(two_package_apks_metadata)
-    assert len(two_metadata.keys()) == 2
+    expected_two_package_metadata = {
+        'org.mozilla.klar': {
+            'klar.apk': {'package_name': 'org.mozilla.klar'}
+        },
+        'org.mozilla.focus': {
+            'focus-1.apk': {'package_name': 'org.mozilla.focus'},
+            'focus-2.apk': {'package_name': 'org.mozilla.focus'}
+        }
+    }
+
+    two_package_metadata = _split_apk_metadata_per_package_name(two_package_apks_metadata)
+    assert len(two_package_metadata.keys()) == 2
+    assert expected_two_package_metadata == two_package_metadata
 
 
 def test_create_or_update_whats_new(edit_service_mock, monkeypatch):

@@ -78,9 +78,10 @@ class PushAPK(Base):
 
         checker.cross_check_apks(apks_metadata_per_paths)
 
-        package_apk_metadata = _get_distinct_package_name_apk_metadata(apks_metadata_per_paths)
+        # Each distinct product must be uploaded in different Google Play transaction, so we split them by package name here.
+        split_apk_metadata = _split_apk_metadata_per_package_name(apks_metadata_per_paths)
 
-        for (package_name, apks_metadata) in package_apk_metadata.items():
+        for (package_name, apks_metadata) in split_apk_metadata.items():
             if self.config.google_play_strings_file:
                 l10n_strings = json.load(self.config.google_play_strings_file)
                 store_l10n.check_translations_schema(l10n_strings)
@@ -97,15 +98,15 @@ class PushAPK(Base):
             self.upload_apks(apks_metadata, package_name, l10n_strings)
 
 
-def _get_distinct_package_name_apk_metadata(apks_metadata_per_paths):
-    package_name_apk_metadata = {}
+def _split_apk_metadata_per_package_name(apks_metadata_per_paths):
+    split_apk_metadata = {}
     for (apk_path, metadata) in apks_metadata_per_paths.items():
         package_name = metadata['package_name']
-        if package_name not in package_name_apk_metadata:
-            package_name_apk_metadata[package_name] = {}
-        package_name_apk_metadata[package_name].update({apk_path: metadata})
+        if package_name not in split_apk_metadata:
+            split_apk_metadata[package_name] = {}
+        split_apk_metadata[package_name].update({apk_path: metadata})
 
-    return package_name_apk_metadata
+    return split_apk_metadata
 
 
 def _create_or_update_whats_new(edit_service, package_name, apk_version_code, l10n_strings):
