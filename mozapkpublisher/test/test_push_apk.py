@@ -10,7 +10,8 @@ from tempfile import NamedTemporaryFile
 from mozapkpublisher.common import googleplay, store_l10n
 from mozapkpublisher.common.apk import checker, extractor
 from mozapkpublisher.common.exceptions import WrongArgumentGiven
-from mozapkpublisher.push_apk import PushAPK, main, _create_or_update_whats_new, _get_ordered_version_codes
+from mozapkpublisher.push_apk import PushAPK, main, _create_or_update_whats_new, \
+    _get_ordered_version_codes, _get_distinct_package_name_apk_metadata
 from mozapkpublisher.test.common.test_store_l10n import set_translations_per_google_play_locale_code, \
     DUMMY_TRANSLATIONS_PER_GOOGLE_PLAY_LOCALE
 
@@ -218,6 +219,25 @@ def test_upload_apk_with_locales_updated_from_file(edit_service_mock, monkeypatc
     assert edit_service_mock.commit_transaction.call_count == 1
 
     assert edit_service_mock.update_listings.call_count == 3
+
+
+def test_get_distinct_package_name_apk_metadata():
+    one_package_apks_metadata = {
+        'fennec-1.apk': {'package_name': 'org.mozilla.firefox'},
+        'fennec-2.apk': {'package_name': 'org.mozilla.firefox'}
+    }
+
+    one_metadata = _get_distinct_package_name_apk_metadata(one_package_apks_metadata)
+    assert len(one_metadata.keys()) == 1
+
+    two_package_apks_metadata = {
+        'focus-1.apk': {'package_name': 'org.mozilla.focus'},
+        'focus-2.apk': {'package_name': 'org.mozilla.focus'},
+        'klar.apk': {'package_name': 'org.mozilla.klar'}
+    }
+
+    two_metadata = _get_distinct_package_name_apk_metadata(two_package_apks_metadata)
+    assert len(two_metadata.keys()) == 2
 
 
 def test_create_or_update_whats_new(edit_service_mock, monkeypatch):
