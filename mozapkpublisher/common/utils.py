@@ -31,6 +31,7 @@ def file_sha512sum(file_path):
 def filter_out_identical_values(list_):
     return list(set(list_))
 
+
 class PRODUCT(Enum):
     KLAR = "org.mozilla.klar"
     FOCUS = "org.mozilla.focus"

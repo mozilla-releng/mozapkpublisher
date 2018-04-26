@@ -1,7 +1,7 @@
 import pytest
 
-from mozapkpublisher.common.apk.checker import cross_check_apks, cross_check_fennec_apks, \
-    _check_number_of_apks, _check_correct_apk_product_types, _check_piece_of_metadata_is_distinct, \
+from mozapkpublisher.common.apk.checker import cross_check_apks, _check_number_of_apks, \
+    _check_correct_apk_product_types, _check_piece_of_metadata_is_distinct, \
     _check_all_apks_have_the_same_package_name, \
     _check_all_apks_have_the_same_version, _check_version_matches_package_name, \
     _check_all_apks_have_the_same_build_id, _check_all_apks_have_the_same_locales, \
@@ -70,7 +70,7 @@ def test_cross_check_apks():
 
 
 def test_check_number_of_apks():
-    _check_number_of_apks({ 'focus.apk': {}, 'klar.apk': {} }, 2)
+    _check_number_of_apks({'focus.apk': {}, 'klar.apk': {}}, 2)
 
     with pytest.raises(BadSetOfApks):
         _check_number_of_apks({
@@ -78,6 +78,7 @@ def test_check_number_of_apks():
             'focus-extra.apk': {},
             'klar.apk': {}
         }, 2)
+
 
 def test_check_correct_apk_product_types():
     _check_correct_apk_product_types({
@@ -87,7 +88,7 @@ def test_check_correct_apk_product_types():
         'klar.apk': {
             'package_name': 'org.mozilla.klar'
         }
-    }, [ PRODUCT.FOCUS, PRODUCT.KLAR ])
+    }, [PRODUCT.FOCUS, PRODUCT.KLAR])
 
     with pytest.raises(BadSetOfApks):
         _check_correct_apk_product_types({
@@ -97,7 +98,7 @@ def test_check_correct_apk_product_types():
             'klar.apk': {
                 'package_name': 'org.mozilla.klar'
             }
-        }, [ PRODUCT.FOCUS, PRODUCT.KLAR ])
+        }, [PRODUCT.FOCUS, PRODUCT.KLAR])
 
 
 def test_check_all_apks_have_the_same_package_name():
@@ -237,6 +238,7 @@ def test_check_piece_of_metadata_is_distinct():
                     'some_key': 'some value 1',
                 },
             })
+
 
 @pytest.mark.parametrize('apks_metadata_per_paths', ({
     'irrelevant_key': {
