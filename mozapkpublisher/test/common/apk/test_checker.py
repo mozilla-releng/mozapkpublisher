@@ -1,8 +1,8 @@
 import pytest
 
-from mozapkpublisher.common.apk.checker import cross_check_apks, _check_number_of_apks, \
-    _check_correct_apk_product_types, _check_piece_of_metadata_is_distinct, \
-    _check_all_apks_have_the_same_package_name, \
+from mozapkpublisher.common.apk.checker import cross_check_apks, \
+    _check_number_of_distinct_packages, _check_correct_apk_product_types, \
+    _check_piece_of_metadata_is_distinct, _check_all_apks_have_the_same_package_name, \
     _check_all_apks_have_the_same_version, _check_version_matches_package_name, \
     _check_all_apks_have_the_same_build_id, _check_all_apks_have_the_same_locales, \
     _check_piece_of_metadata_is_unique, _check_apks_version_codes_are_correctly_ordered, \
@@ -70,13 +70,29 @@ def test_cross_check_apks():
 
 
 def test_check_number_of_apks():
-    _check_number_of_apks({'focus.apk': {}, 'klar.apk': {}}, 2)
+    _check_number_of_distinct_packages({
+        'focus.apk': {
+            'package_name': 'org.mozilla.focus'
+        },
+        'klar-x86.apk': {
+            'package_name': 'org.mozilla.klar'
+        },
+        'klar-arm7.apk': {
+            'package_name': 'org.mozilla.klar'
+        }
+    }, 2)
 
     with pytest.raises(BadSetOfApks):
-        _check_number_of_apks({
-            'focus.apk': {},
-            'focus-extra.apk': {},
-            'klar.apk': {}
+        _check_number_of_distinct_packages({
+            'focus.apk': {
+                'package_name': 'org.mozilla.focus'
+            },
+            'klar.apk': {
+                'package_name': 'org.mozilla.klar'
+            },
+            'fennec.apk': {
+                'package_name': 'org.mozilla.firefox'
+            }
         }, 2)
 
 

@@ -76,15 +76,17 @@ def cross_check_fennec_apks(apks_metadata_per_paths):
 
 def cross_check_focus_apks(apks_metadata_per_paths):
     _check_piece_of_metadata_is_distinct('package_name', 'Package name', apks_metadata_per_paths)
-    _check_number_of_apks(apks_metadata_per_paths, 2)
+    _check_number_of_distinct_packages(apks_metadata_per_paths, 2)
     _check_correct_apk_product_types(apks_metadata_per_paths, [PRODUCT.FOCUS, PRODUCT.KLAR])
     logger.info('APKs are sane!')
 
 
-def _check_number_of_apks(apks_metadata_per_paths, max_apks):
-    if (len(apks_metadata_per_paths.keys()) > max_apks):
-        raise BadSetOfApks('Expected max {} apks, found {}'.format(max_apks, len(apks_metadata_per_paths)))
-    logger.info('Found expected number of APKs, not more than {}'.format(max_apks))
+def _check_number_of_distinct_packages(apks_metadata_per_paths, max_packages):
+    all_items = [metadata['package_name'] for metadata in apks_metadata_per_paths.values()]
+    unique_packages = filter_out_identical_values(all_items)
+    if (len(unique_packages) > max_packages):
+        raise BadSetOfApks('Expected max {} package names, found {}'.format(max_packages, len(unique_packages)))
+    logger.info('Found expected number of package names, not more than {}'.format(max_packages))
 
 
 def _check_correct_apk_product_types(apks_metadata_per_paths, product_types):
