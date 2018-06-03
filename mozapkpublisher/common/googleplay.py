@@ -57,7 +57,7 @@ class EditService(object):
             general_service = _connect(service_account, credentials_file_path)
             self._service = general_service.edits()
         else:
-            self._service = _craft_google_play_service_mock()
+            self._service = _craft_google_play_edit_service_mock()
             logger.warn('`--do-not-contact-google-play` option was given. Not a single request to Google Play will be made!')
 
         self._package_name = package_name
@@ -140,7 +140,7 @@ class EditService(object):
         logger.debug(u'Apk listing response: {}'.format(response))
 
 
-def _craft_google_play_service_mock():
+def _craft_google_play_edit_service_mock():
     edit_service_mock = MagicMock()
 
     edit_service_mock.insert = lambda *args, **kwargs: _ExecuteDummy({'id': 'fake-transaction-id'})
@@ -157,6 +157,47 @@ def _craft_google_play_service_mock():
     edit_service_mock.apklistings = lambda *args, **kwargs: update_mock
 
     return edit_service_mock
+
+
+class ReviewService(object):
+    def __init__(self, service_account, credentials_file_path, package_name, commit=False, contact_google_play=True):
+        self._contact_google_play = contact_google_play
+        if self._contact_google_play:
+            general_service = _connect(service_account, credentials_file_path)
+            self._service = general_service.reviews()
+        else:
+            self._service = _craft_google_play_review_service_mock()
+            logger.warn('`--do-not-contact-google-play` option was given. Not a single request to Google Play will be made!')
+
+        self._package_name = package_name
+        self._commit = commit
+
+    def reply(self, review_id, reply_text):
+        body = {"replyText": reply_text}
+        return self._service.reply(packageName=self._package_name, reviewId=review_id, body=body).execute()
+
+
+class Reply(object):
+    def __init__(self, text):
+        self.replyText = text
+
+
+def _craft_google_play_review_service_mock():
+    review_service_mock = MagicMock()
+
+    review_service_mock.reply = lambda *args, **kwargs: _ExecuteDummy(
+        {
+            "result": {
+                "replyText": kwargs['body']['replyText'],
+                "lastEdited": {
+                    "nanos": 42,
+                    "seconds": "A String",
+                },
+            }
+        }
+    )
+
+    return review_service_mock
 
 
 class _ExecuteDummy():
