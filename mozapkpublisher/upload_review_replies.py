@@ -9,7 +9,7 @@ from mozapkpublisher.common.base import Base
 
 logger = logging.getLogger(__name__)
 
-PACKAGE_NAME = 'org.mozilla.firefox'
+PACKAGE_NAME = 'org.mozilla.firefox_beta'
 EMPTY = '#N/A'
 CSV_REPLY_ROW = 2
 CSV_REVIEW_ID_ROW = 5
