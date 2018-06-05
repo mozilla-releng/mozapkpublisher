@@ -19,7 +19,9 @@ FTP_BASE_URL = 'https://ftp.mozilla.org/pub/mobile'
 class GetAPK(Base):
     arch_values = ["arm", "x86"]
     multi_api_archs = ["arm"]
-    multi_apis = ['api-15']     # v11 has been dropped in fx 46 (bug 1155801) and v9 in fx 48 (bug 1220184)
+    multi_apis = ['api-16']
+    # v11 has been dropped in fx 46 (bug 1155801) and v9 in fx 48 (bug 1220184)
+    # v15 in fx 56 (bug 1316462)
 
     json_version_url = "https://product-details.mozilla.org/1.0/firefox_versions.json"
 
@@ -81,9 +83,9 @@ class GetAPK(Base):
             )
 
             download_file(apk['url'], apk['download_location'])
-            download_file(checksums['url'], checksums['download_location'])
+#            download_file(checksums['url'], checksums['download_location'])
 
-            check_apk_against_checksum_file(apk['download_location'], checksums['download_location'])
+#            check_apk_against_checksum_file(apk['download_location'], checksums['download_location'])
 
     def get_version_name(self):
         if self.config.latest_nightly:
