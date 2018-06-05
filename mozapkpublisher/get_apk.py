@@ -83,9 +83,9 @@ class GetAPK(Base):
             )
 
             download_file(apk['url'], apk['download_location'])
-            download_file(checksums['url'], checksums['download_location'])
+#            download_file(checksums['url'], checksums['download_location'])
 
-            check_apk_against_checksum_file(apk['download_location'], checksums['download_location'])
+#            check_apk_against_checksum_file(apk['download_location'], checksums['download_location'])
 
     def get_version_name(self):
         if self.config.latest_nightly:
