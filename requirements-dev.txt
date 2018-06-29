@@ -1,5 +1,5 @@
 google-api-python-client==1.7.3
-oauth2client
+oauth2client==4.1.2
 pyOpenSSL
 requests
 voluptuous
