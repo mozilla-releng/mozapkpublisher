@@ -5,12 +5,13 @@ language: python
 matrix:
   include:
     - python: 3.5
-      env: TOXENV=py35
+      env:
+        - TOXENV=py35
+        - SKIP_NETWORK_TESTS=0
     - python: 3.6
-      env: TOXENV=py36
-
-env:
- - SKIP_NETWORK_TESTS=0
+      env:
+        - TOXENV=py36
+        - SKIP_NETWORK_TESTS=0
 
 install:
     - travis_retry pip install tox
