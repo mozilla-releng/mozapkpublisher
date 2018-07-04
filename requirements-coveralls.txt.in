@@ -1,2 +1,2 @@
 # pyup: ignore file
-codecov
+python-coveralls

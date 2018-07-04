@@ -17,4 +17,4 @@ install:
 script:
     - tox -e "$TOXENV"
 after_success:
-    - if [[ $TOXENV == 'py36' ]] ; then COVERAGE_ENV=$TOXENV tox -e codecov; else echo "No coverage to do"; fi
+    - if [[ $TOXENV == 'py36' ]] ; then tox -e coveralls; else echo "No coverage to do"; fi
