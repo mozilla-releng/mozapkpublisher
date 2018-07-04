@@ -4,16 +4,10 @@ import argparse
 import csv
 import logging
 
-from mozapkpublisher.common import googleplay
+from mozapkpublisher.common import googleplay, store_l10n
 from mozapkpublisher.common.base import Base
 
 logger = logging.getLogger(__name__)
-
-PACKAGE_NAME = 'org.mozilla.firefox'
-EMPTY = '#N/A'
-CSV_REPLY_ROW = 2
-CSV_REVIEW_ID_ROW = 6
-CSV_UPLOADED_ROW = 8
 
 MAX_BULK_SIZE = 500
 
@@ -33,10 +27,18 @@ class UploadReviewReplies(Base):
 
         googleplay.add_general_google_play_arguments(cls.parser)
 
+        cls.parser.add_argument('--package-name',
+                                choices=store_l10n.STORE_PRODUCT_DETAILS_PER_PACKAGE_NAME.keys(),
+                                help='The APK package name', required=True)
         cls.parser.add_argument('--replies', dest='reviews_replies_file',
                                 type=argparse.FileType(mode='r'),
                                 help='Bulk upload given CSV_FILE',
                                 required=True)
+        cls.parser.add_argument('--csv-columns',
+                                nargs=2, type=int, default=[0, 1],
+                                help='Set the REPLY_COLUMN and REVIEW_ID_COLUMN',
+                                metavar=('REPLY_COLUMN', 'REVIEW_ID_COLUMN'),
+                                required=False)
         cls.parser.add_argument('--id-blacklist', dest='review_id_blacklist_file',
                                 type=argparse.FileType(mode='r'),
                                 help='Log IDs to skip',
@@ -49,7 +51,7 @@ class UploadReviewReplies(Base):
     def upload_review_replies(self):
         self.review_service = googleplay.ReviewService(
             self.config.service_account, self.config.google_play_credentials_file.name,
-            PACKAGE_NAME, contact_google_play=self.config.contact_google_play
+            self.config.package_name, contact_google_play=self.config.contact_google_play
         )
         reader = csv.reader(self.config.reviews_replies_file)
         count = 0
@@ -59,18 +61,18 @@ class UploadReviewReplies(Base):
         else:
             blacklist = set()
 
+        csv_reply_column = self.config.csv_columns[0]
+        csv_review_id_column = self.config.csv_columns[1]
+
         # skip header
         next(reader)
         for row in reader:
             if count >= MAX_BULK_SIZE:
                 logger.info("Uploaded {} replies. Stopping!".format(count))
                 break
-            if row[CSV_UPLOADED_ROW] == "n":
-                logger.info("Skipping")
-                continue
-            if row[0] != EMPTY and row[CSV_REVIEW_ID_ROW] and row[CSV_REPLY_ROW]:
-                review_id = row[CSV_REVIEW_ID_ROW]
-                reply_text = row[CSV_REPLY_ROW]
+            if row[csv_review_id_column] and row[csv_reply_column]:
+                review_id = row[csv_review_id_column]
+                reply_text = row[csv_reply_column]
                 if review_id in blacklist:
                     logger.info("blacklisted {}".format(review_id))
                     continue
