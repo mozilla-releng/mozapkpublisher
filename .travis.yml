@@ -1,9 +1,13 @@
 sudo: false
 
 language: python
-python:
-  - "3.6"
-  - "3.5"
+
+matrix:
+  include:
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
 
 env:
  - SKIP_NETWORK_TESTS=0
@@ -11,7 +15,6 @@ env:
 install:
     - travis_retry pip install tox
 script:
-    - TOX_ENVIRONMENT="py${TRAVIS_PYTHON_VERSION//./}"
-    - tox -e "$TOX_ENVIRONMENT"
+    - tox -e "$TOXENV"
 after_success:
-    - if [[ $TOX_ENVIRONMENT == 'py36' ]] ; then tox -e py36-coveralls; else echo "No coverage to do"; fi
+    - if [[ $TOXENV == 'py36' ]] ; then COVERAGE_ENV=$TOXENV tox -e codecov; else echo "No coverage to do"; fi

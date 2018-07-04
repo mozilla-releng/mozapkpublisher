@@ -1,0 +1,9 @@
+# pyup: ignore file
+# Adding this .in files allows to generate a full requirements-test.txt used by tox.
+-r requirements.txt.in
+coverage
+flake8
+pytest
+pytest-cov
+mock
+requests_mock
