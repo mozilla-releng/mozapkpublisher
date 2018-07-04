@@ -1,45 +1,15 @@
 import logging
-import re
 
 from functools import partial
 
+from mozilla_version.firefox import FirefoxVersion
+
+from mozapkpublisher.common.apk.history import get_expected_api_levels_for_version, get_expected_architectures_for_version
 from mozapkpublisher.common.exceptions import BadApk, BadSetOfApks, NotMultiLocaleApk
 from mozapkpublisher.common.utils import filter_out_identical_values, PRODUCT
 
 logger = logging.getLogger(__name__)
 
-
-_MAJOR_FIREFOX_VERSIONS_PER_API_LEVEL = {
-    15: {
-        'first_firefox_version': 46,   # Bug 1220184
-        'last_firefox_version': 55,    # Bug 1316462
-    },
-    16: {
-        'first_firefox_version': 56,   # Bug 1316462
-    }
-}
-
-# TODO: Support ARM64, once bug 1368484 is ready
-_MAJOR_FIREFOX_VERSIONS_PER_ARCHITECTURE = {
-    'armeabi-v7a': {
-        'first_firefox_version': 4,      # Bug 618789
-    },
-    'x86': {
-        'first_firefox_version': 14,    # Bug 757909
-    },
-}
-
-_MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME = {
-    # Due to project Dawn, Nightly is now using the Aurora package name. See bug 1357351.
-    'org.mozilla.fennec_aurora': re.compile(r'^\d+\.0a1$'),
-    # XXX Betas aren't following the regular XX.0bY format. Instead they follow XX.0.
-    'org.mozilla.firefox_beta': re.compile(r'^\d+\.0$'),
-    # Simplified regex. We don't need something as complex as
-    # https://github.com/mozilla-releng/ship-it/blob/890929b0c3e6df1b72489d2f3cf60450b91114f2/kickoff/static/model/release.js#L4
-    # because we just want to check that 56.0b1 is not shipped with
-    # the package name org.mozilla.firefox, for instance
-    'org.mozilla.firefox': re.compile(r'^\d+\.\d+(\.\d+)?$'),
-}
 
 # x86 must have the highest version code. See bug 1338477 for more context.
 # TODO: Support ARM64, once bug 1368484 is ready
@@ -114,11 +84,27 @@ _check_all_apks_have_the_same_locales = partial(_check_piece_of_metadata_is_uniq
 
 
 def _check_version_matches_package_name(version, package_name):
-    regex = _MATCHING_VERSION_NUMBER_PER_PACKAGE_NAME[package_name]
-    if regex.match(version) is None:
-        raise BadApk('Wrong version number "{}" for package name "{}"'.format(version, package_name))
+    sanitized_version = FirefoxVersion(version)
 
-    logger.info('Firefox version "{}" matches package name "{}"'.format(version, package_name))
+    if (
+        (package_name == 'org.mozilla.firefox' and sanitized_version.is_release) or
+        # Due to project Dawn, Nightly is now using the Aurora package name. See bug 1357351.
+        (package_name == 'org.mozilla.fennec_aurora' and sanitized_version.is_nightly) or
+        (
+            # XXX Betas aren't following the regular XX.0bY format. Instead they follow XX.0
+            # (which looks like release). Therefore, we can't use sanitized_version.is_beta
+            package_name == 'org.mozilla.firefox_beta'
+            and sanitized_version.is_release
+            and sanitized_version.minor_number == 0
+            # We ensure the patch_number is undefined. Calling sanitized_version.patch_number
+            # directly raises an (expected) AttributeError
+            and getattr(sanitized_version, 'patch_number', None) is None
+        )
+    ):
+        logger.info('Firefox version "{}" matches package name "{}"'.format(version, package_name))
+
+    else:
+        raise BadApk('Wrong version number "{}" for package name "{}"'.format(version, package_name))
 
 
 def _check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
@@ -164,8 +150,8 @@ def _check_all_apks_are_multi_locales(apks_metadata_per_paths):
 
 def _check_all_architectures_and_api_levels_are_present(apks_metadata_per_paths):
     firefox_version = list(apks_metadata_per_paths.values())[0]['firefox_version']
-    expected_api_levels = _get_expected_api_levels_for_version(firefox_version)
-    expected_architectures = _get_expected_architectures_for_version(firefox_version)
+    expected_api_levels = get_expected_api_levels_for_version(firefox_version)
+    expected_architectures = get_expected_architectures_for_version(firefox_version)
     expected_combos = _craft_expected_combos(firefox_version, expected_api_levels, expected_architectures)
 
     current_combos = set([
@@ -189,30 +175,6 @@ Please make sure mozapkpublisher has allowed them to be uploaded.'.format(
     logger.info('Every expected APK was found!')
 
 
-def _get_expected_api_levels_for_version(firefox_version):
-    return _get_expected_things_for_version(firefox_version, _MAJOR_FIREFOX_VERSIONS_PER_API_LEVEL, 'API level')
-
-
-def _get_expected_architectures_for_version(firefox_version):
-    return _get_expected_things_for_version(firefox_version, _MAJOR_FIREFOX_VERSIONS_PER_ARCHITECTURE, 'architecture')
-
-
-def _get_expected_things_for_version(firefox_version, dict_of_things, thing_name):
-    things = tuple(sorted([
-        thing
-        for thing, range_dict in dict_of_things.items()
-        if _is_firefox_version_in_range(firefox_version, range_dict)
-    ]))
-
-    if not things:
-        raise Exception('No {0} found for Firefox version {1}. Current rules for {0}: {2}'.format(
-            thing_name, firefox_version, dict_of_things
-        ))
-
-    logger.debug('Expected to find these {}s for Firefox {}: {}'.format(thing_name, firefox_version, things))
-    return things
-
-
 def _craft_expected_combos(firefox_version, expected_api_levels, expected_architectures):
     highest_api_level = max(expected_api_levels)
     expected_combos = []
@@ -228,23 +190,6 @@ def _craft_expected_combos(firefox_version, expected_api_levels, expected_archit
         len(expected_combos), firefox_version, _craft_combos_pretty_names(expected_combos)
     ))
     return set(expected_combos)
-
-
-def _is_firefox_version_in_range(firefox_version, range_dict):
-    first_firefox_version = range_dict['first_firefox_version']
-    current_major_version = _get_firefox_major_version_number(firefox_version)
-    if current_major_version < first_firefox_version:
-        return False
-
-    last_firefox_version = range_dict.get('last_firefox_version', None)
-    if last_firefox_version is not None and current_major_version > last_firefox_version:
-        return False
-
-    return True
-
-
-def _get_firefox_major_version_number(version):
-    return int(version.split('.')[0])
 
 
 def _craft_combos_pretty_names(combos):

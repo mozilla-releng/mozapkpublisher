@@ -1,6 +1,7 @@
-google-api-python-client
-oauth2client
-pyOpenSSL
-requests
-voluptuous
-androguard
+google-api-python-client==1.7.3
+oauth2client==4.1.2
+mozilla-version==0.1.2
+pyOpenSSL==18.0.0
+requests==2.19.1
+voluptuous==0.11.1
+androguard==3.2.0
