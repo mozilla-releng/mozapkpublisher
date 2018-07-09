@@ -17,5 +17,4 @@ install:
     - travis_retry pip install tox
 script:
     - tox -e "$TOXENV"
-after_success:
     - if [[ $TOXENV == 'py36' ]] ; then tox -e coveralls; else echo "No coverage to do"; fi
