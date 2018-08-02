@@ -4,12 +4,11 @@ import re
 import shutil
 import tempfile
 
-from distutils.util import strtobool
-
 from mozapkpublisher.get_apk import GetAPK
+from mozapkpublisher.test import skip_when_no_network
 
 
-@pytest.mark.skipif(strtobool(os.environ.get('SKIP_NETWORK_TESTS', 'true')), reason='Tests requiring network are skipped')
+@skip_when_no_network
 @pytest.mark.parametrize('get_apk_args, apks_file_regexes', (
     # Re-enable latest_nightly once bug 1346752 is fixed
     # ({'latest_nightly': True, 'arch': 'x86'}, (r'fennec-\d{2}\.0a1\.multi\.android-i386\.apk',)),
