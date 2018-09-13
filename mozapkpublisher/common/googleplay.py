@@ -29,8 +29,9 @@ _DEFAULT_TRACK_VALUES = ['production', 'beta', 'alpha', 'rollout', 'internal']
 
 # Google play allows the creation of custom release tracks for apps.
 _ADDITIONAL_TRACK_VALUES = {
+    'org.mozilla.fenix': ['nightly'],
     'org.mozilla.focus': ['nightly'],
-    'org.mozilla.klar': ['nightly']
+    'org.mozilla.klar': ['nightly'],
 }
 
 logger = logging.getLogger(__name__)

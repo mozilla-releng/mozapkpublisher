@@ -54,14 +54,28 @@ def test_cross_check_apks():
     cross_check_apks({
         'Focus.apk': {
             'api_level': 21,
-            'architecture': 'armeabi-v7',
+            'architecture': 'armeabi-v7a',
             'package_name': 'org.mozilla.focus',
             'version_code': '11'
         },
         'Klar.apk': {
             'api_level': 21,
-            'architecture': 'armeabi-v7',
+            'architecture': 'armeabi-v7a',
             'package_name': 'org.mozilla.klar',
+            'version_code': '11'
+        }
+    })
+    cross_check_apks({
+        'fenix_86.apk': {
+            'api_level': 21,
+            'architecture': 'x86',
+            'package_name': 'org.mozilla.fenix',
+            'version_code': '12'
+        },
+        'fenix_arm.apk': {
+            'api_level': 21,
+            'architecture': 'armeabi-v7a',
+            'package_name': 'org.mozilla.fenix',
             'version_code': '11'
         }
     })

@@ -36,6 +36,12 @@ class PRODUCT(Enum):
     KLAR = "org.mozilla.klar"
     FOCUS = "org.mozilla.focus"
 
+    FENIX = "org.mozilla.fenix"
+
+    FENNEC_NIGHTLY = "org.mozilla.fennec_aurora"
+    FENNEC_BETA = "org.mozilla.firefox_beta"
+    FENNEC_RELEASE = "org.mozilla.firefox"
+
     @staticmethod
     def get_value_or_none(value):
         return PRODUCT(value) if PRODUCT.contains_value(value) else None
