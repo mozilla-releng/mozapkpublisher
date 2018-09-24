@@ -176,7 +176,7 @@ class ReviewService(object):
     def __init__(self, service_account, credentials_file_path, package_name, commit=False, contact_google_play=True):
         self._contact_google_play = contact_google_play
         if self._contact_google_play:
-            general_service = _connect(service_account, credentials_file_path)
+            general_service = connect(service_account, credentials_file_path)
             self._service = general_service.reviews()
         else:
             self._service = _craft_google_play_review_service_mock()
@@ -188,11 +188,6 @@ class ReviewService(object):
     def reply(self, review_id, reply_text):
         body = {"replyText": reply_text}
         return self._service.reply(packageName=self._package_name, reviewId=review_id, body=body).execute()
-
-
-class Reply(object):
-    def __init__(self, text):
-        self.replyText = text
 
 
 def _craft_google_play_review_service_mock():

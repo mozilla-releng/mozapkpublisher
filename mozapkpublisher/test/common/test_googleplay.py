@@ -6,7 +6,7 @@ import tempfile
 from unittest.mock import MagicMock
 
 from mozapkpublisher.common.exceptions import NoTransactionError, WrongArgumentGiven
-from mozapkpublisher.common.googleplay import add_general_google_play_arguments, EditService, is_package_name_nightly
+from mozapkpublisher.common.googleplay import add_general_google_play_arguments, EditService, is_package_name_nightly, ReviewService
 
 
 def test_add_general_google_play_arguments():
@@ -26,6 +26,16 @@ def test_is_package_name_nightly():
     assert is_package_name_nightly('org.mozilla.fennec_aurora')
     assert not is_package_name_nightly('org.mozilla.firefox_beta')
     assert not is_package_name_nightly('org.mozilla.firefox')
+
+
+def set_up_reply_service_mock(_monkeypatch):
+    general_service_mock = MagicMock()
+    reply_service_mock = MagicMock()
+
+    general_service_mock.reviews = lambda: reply_service_mock
+
+    _monkeypatch.setattr('mozapkpublisher.common.googleplay.connect', lambda _, __: general_service_mock)
+    return reply_service_mock
 
 
 def set_up_edit_service_mock(_monkeypatch):
@@ -180,3 +190,17 @@ def test_update_whats_new(monkeypatch):
         apkVersionCode='2015012345',
         body={'recentChanges': 'Check out this cool feature!'}
     )
+
+
+def test_upload_review_replies(monkeypatch):
+    reply_mock = set_up_reply_service_mock(monkeypatch)
+    review_service = ReviewService('service_account', 'credentials_file_path', 'dummy_package_name')
+    review_service.reply(1, "foobar 1")
+    reply_mock.reply.assert_called_once()
+
+
+def test_upload_review_replies_with_mock(monkeypatch):
+    set_up_reply_service_mock(monkeypatch)
+    review_service = ReviewService('service_account', 'credentials_file_path', 'dummy_package_name', contact_google_play=False)
+    r = review_service.reply(1, "foobar 1")
+    assert r == review_service._service.reply(body={"replyText": "foobar 1"}).execute()
