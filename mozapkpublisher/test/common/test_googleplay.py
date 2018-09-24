@@ -196,7 +196,7 @@ def test_upload_review_replies(monkeypatch):
     reply_mock = set_up_reply_service_mock(monkeypatch)
     review_service = ReviewService('service_account', 'credentials_file_path', 'dummy_package_name')
     review_service.reply(1, "foobar 1")
-    reply_mock.reply.assert_called_once()
+    reply_mock.reply.assert_called_once_with(body={'replyText': 'foobar 1'}, packageName='dummy_package_name', reviewId=1)
 
 
 def test_upload_review_replies_with_mock(monkeypatch):

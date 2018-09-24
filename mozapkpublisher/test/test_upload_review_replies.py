@@ -40,7 +40,7 @@ def test_upload_review_replies(review_service_mock, monkeypatch):
     config['contact_google_play'] = False
     upload_review_replies.UploadReviewReplies(config).run()
 
-    review_service_mock.reply.assert_called()
+    review_service_mock.reply.assert_called_with(reply_text='foobar 1', review_id='1')
 
 
 def test_upload_review_replies_with_all_flags(review_service_mock, monkeypatch, tmpdir):
@@ -49,10 +49,10 @@ def test_upload_review_replies_with_all_flags(review_service_mock, monkeypatch, 
     config['replies'] = os.path.join(DATA_DIR, 'replies.csv')
     config['contact_google_play'] = False
     config['id_blacklist'] = os.path.join(DATA_DIR, 'review_blacklist.txt')
-    config['id_log'] = os.path.join(tmpdir, "id_log.txt")
+    config['id_log'] = os.path.join(str(tmpdir), "id_log.txt")
     upload_review_replies.UploadReviewReplies(config).run()
 
-    review_service_mock.reply.assert_called_once()
+    review_service_mock.reply.assert_called_once_with(reply_text='foobar 2', review_id='2')
 
 
 def test_main(monkeypatch):
