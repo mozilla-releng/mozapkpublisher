@@ -7,7 +7,7 @@ Scripts to publish Firefox for Android on Google Play Store.
 1. :warning: You need Python >= 3.5 to run this set of scripts. Python 2 isn't supported starting version 0.5.0
 1. Create a virtualenv and source it
 ```sh
-virtualenv venv
+virtualenv -p python3 venv
 source venv/bin/activate
 ```
 1. `pip install -r requirements.txt`
@@ -56,10 +56,8 @@ source venv/bin/activate
 1. Download the latest signed builds. For instance, for Fennec Nightly: `./mozapkpublisher/get_apk.py --latest-nightly`
 1. 
 ```sh
-./mozapkpublisher/push_apk.py --package-name org.mozilla.fennec_aurora --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@iam.gserviceaccount.com --apk-x86 x86.apk  --apk-armv7-v15 arm.apk --dry-run
+./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@iam.gserviceaccount.com x86.apk arm.apk
 ```
 
-  * Note the `--dry-run` option. This will do everything needed, but commit the transaction.
-  * Note `org.mozilla.fennec_aurora`, even though we're publishing Nightly. This is because of [Bug 1354821](https://bugzilla.mozilla.org/show_bug.cgi?id=1354821)
   * Note `beta` track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for Nightly, unlike beta and release.
-1. Run the above command, but without `--dry-run`
+1. If all goes well, add `--commit` to the command line and rerun it.
