@@ -6,5 +6,6 @@ coverage
 flake8
 pytest
 pytest-cov
+pytest-asyncio
 mock
 requests_mock
