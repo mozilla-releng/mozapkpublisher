@@ -3,10 +3,14 @@
 # This file is intended to generate requirements.txt. requirements.txt contains the following
 # packages + all their dependencies. This enables reproducible builds. Therefore, please update
 # this file whenever a new dependency is used by mozapkpublisher (but not by one of its
-# dependencies). Then, run `dephash --verbose gen requirements.txt.in > requirements.txt` (this
-# may take a while depending on your Internet connection).
+# dependencies). Then, run:
+#
+#    pip-compile --generate-hashes --output-file requirements.txt requirements.txt.in
+#
+aiohttp
 androguard
 google-api-python-client
+humanize
 mozilla-version
 oauth2client
 pyOpenSSL   # Even not imported once in mozapkpublisher, it's needed to open p12 files
