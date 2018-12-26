@@ -179,10 +179,9 @@ google-auth-httplib2==0.0.3 \
     --hash=sha512:2e19298c36fd4f8242f471cc0487b33eb2707fcb2d51e35228480ab8216062f28091391e5bdaffea3029136b6a804b1fbe3fce0ae9b056bb0f2bc6ebad5826ba \
     --hash=sha512:da9d280f2ab3f9d99e2f011d56d94b09a12e85a5a1e9f78933a93cc57c7778d9002e1a023552a2611283da696334ba795cd7e8003b311db05e9b6b40aca34dc7 \
     # via google-api-python-client
-google-auth==1.6.1 \
-    --hash=sha512:731ce165306c95a696398e6002532d4f94b37e4cd7116e62024521615fe8dcf56b9189f0185e8c96d8706630f2c85b6f9ffad874de408f35d4b511b2b38ffc45 \
-    --hash=sha512:9e9b6802823dc488f63722989231f1ef68f83ba4ea294418df053327a8ae9ae60db23d3cd3fc56e247bbc171778981836ea4b28e3db41e27b7e84f826e2643f8 \
-    # via google-api-python-client, google-auth-httplib2
+google-auth==1.6.2 \
+    --hash=sha256:b6081ba9946828d6417c15ecdc723fdb7c007cdd74e140747d3876a7440f0be5 \
+    --hash=sha256:e8d64e9bc8cb6f0fc5360c693f86dc9ee6964081ee702e3b5ddc937f99efc950    # via google-api-python-client, google-auth-httplib2
 httplib2==0.12.0 \
     --hash=sha512:f9eead2dc764b0506d27df95b034b6aec1e539c16f5eca05b4c39dd159a4ebee652ba049b819153c9c8d6b67881452c35f483920191bcbfcca56d68a5d31bc4e \
     # via google-api-python-client, google-auth-httplib2, oauth2client
