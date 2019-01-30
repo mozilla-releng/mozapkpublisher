@@ -164,9 +164,9 @@ cycler==0.10.0 \
 decorator==4.3.2 \
     --hash=sha256:cabb249f4710888a2fc0e13e9a16c343d932033718ff62e1e9bc93a9d3a9122b \
     --hash=sha256:33cd704aea07b4c28b3eb2c97d288a06918275dac0ecebdaf1bc8a48d98adb9e    # via ipython, networkx, traitlets
-flake8==3.6.0 \
-    --hash=sha512:0bfcc8ec78fba7d27de77a42dffac350afc99b63a772dc41945bc51068b2f13c180959d6827f2ab2330eff07f35c5980a1ffd04ef7cff0bfb290b7c58a414637 \
-    --hash=sha512:f4377bc7806074a88f88b3652c3061583e576ee515b2b741cee9c6dc18f84f34a7807c93fda9dca3d8b006e379dcee60bb3ae20e6a2e62fd216a82a2b36f2eb5
+flake8==3.7.1 \
+    --hash=sha256:545c8faa8425cafcd9800538b4fa324a543cdec0ac273cf698ddd6a954123401 \
+    --hash=sha256:e9ca1bb84d76511315e565a2cdd292d916b08b0d639aa3e323d8c7d895a03897
 future==0.17.1 \
     --hash=sha512:50094c44db81afbfd37ee25e1710ed11ecb2c2d64ad076fb62a2688dd36a9696ab26b0d7989bf1ecb10da251961a0ee6bb37c4dbd115f70384cd8c9a675d0b2d \
     # via androguard
