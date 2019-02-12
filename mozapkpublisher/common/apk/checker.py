@@ -12,8 +12,8 @@ from mozapkpublisher.common.utils import filter_out_identical_values, PRODUCT
 logger = logging.getLogger(__name__)
 
 
-# x86 must have the highest version code. See bug 1338477 for more context.
-_ARCHITECTURE_ORDER_REGARDING_VERSION_CODE = ('armeabi-v7a', 'arm64-v8a', 'x86')
+# x86 (and now x86_64) must have the highest version code. See bug 1338477 for more context.
+_ARCHITECTURE_ORDER_REGARDING_VERSION_CODE = ('armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64')
 
 
 def cross_check_apks(apks_metadata_per_paths):

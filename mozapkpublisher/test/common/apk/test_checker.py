@@ -104,6 +104,79 @@ from mozapkpublisher.common.exceptions import NotMultiLocaleApk, BadApk, BadSetO
         'version_code': '2015605651',
     },
 }, {
+    'arm.apk': {
+        'api_level': 16,
+        'architecture': 'armeabi-v7a',
+        'firefox_version': '67.0a1',
+        'firefox_build_id': '20190115103851',
+        'locales': (
+            'an', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn-BD', 'bn-IN', 'br', 'bs', 'ca', 'cak',
+            'cs', 'cy', 'da', 'de', 'dsb', 'el', 'en-CA', 'en-GB', 'en-US', 'en-ZA', 'eo', 'es-AR',
+            'es-CL', 'es-ES', 'es-MX', 'et', 'eu', 'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd',
+            'gl', 'gn', 'gu-IN', 'he', 'hi-IN', 'hr', 'hsb', 'hu', 'hy-AM', 'id', 'is', 'it', 'ja',
+            'ka', 'kab', 'kk', 'kn', 'ko', 'lij', 'lo', 'lt', 'lv', 'mai', 'ml', 'mr', 'ms', 'my',
+            'nb-NO', 'ne-NP', 'nl', 'nn-NO', 'oc', 'or', 'pa-IN', 'pl', 'pt-BR', 'pt-PT', 'rm',
+            'ro', 'ru', 'sk', 'sl', 'son', 'sq', 'sr', 'sv-SE', 'ta', 'te', 'th', 'tr', 'trs',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'xh', 'zam', 'zh-CN', 'zh-TW'
+        ),
+        'package_name': 'org.mozilla.fennec_aurora',
+        'version_code': '2015605649',
+    },
+    'x86.apk': {
+        'api_level': 16,
+        'architecture': 'x86',
+        'firefox_version': '67.0a1',
+        'firefox_build_id': '20190115103851',
+        'locales': (
+            'an', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn-BD', 'bn-IN', 'br', 'bs', 'ca', 'cak',
+            'cs', 'cy', 'da', 'de', 'dsb', 'el', 'en-CA', 'en-GB', 'en-US', 'en-ZA', 'eo', 'es-AR',
+            'es-CL', 'es-ES', 'es-MX', 'et', 'eu', 'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd',
+            'gl', 'gn', 'gu-IN', 'he', 'hi-IN', 'hr', 'hsb', 'hu', 'hy-AM', 'id', 'is', 'it', 'ja',
+            'ka', 'kab', 'kk', 'kn', 'ko', 'lij', 'lo', 'lt', 'lv', 'mai', 'ml', 'mr', 'ms', 'my',
+            'nb-NO', 'ne-NP', 'nl', 'nn-NO', 'oc', 'or', 'pa-IN', 'pl', 'pt-BR', 'pt-PT', 'rm',
+            'ro', 'ru', 'sk', 'sl', 'son', 'sq', 'sr', 'sv-SE', 'ta', 'te', 'th', 'tr', 'trs',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'xh', 'zam', 'zh-CN', 'zh-TW'
+        ),
+        'package_name': 'org.mozilla.fennec_aurora',
+        'version_code': '2015605653',
+    },
+    'aarch64.apk': {
+        'api_level': 21,
+        'architecture': 'arm64-v8a',
+        'firefox_version': '67.0a1',
+        'firefox_build_id': '20190115103851',
+        'locales': (
+            'an', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn-BD', 'bn-IN', 'br', 'bs', 'ca', 'cak',
+            'cs', 'cy', 'da', 'de', 'dsb', 'el', 'en-CA', 'en-GB', 'en-US', 'en-ZA', 'eo', 'es-AR',
+            'es-CL', 'es-ES', 'es-MX', 'et', 'eu', 'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd',
+            'gl', 'gn', 'gu-IN', 'he', 'hi-IN', 'hr', 'hsb', 'hu', 'hy-AM', 'id', 'is', 'it', 'ja',
+            'ka', 'kab', 'kk', 'kn', 'ko', 'lij', 'lo', 'lt', 'lv', 'mai', 'ml', 'mr', 'ms', 'my',
+            'nb-NO', 'ne-NP', 'nl', 'nn-NO', 'oc', 'or', 'pa-IN', 'pl', 'pt-BR', 'pt-PT', 'rm',
+            'ro', 'ru', 'sk', 'sl', 'son', 'sq', 'sr', 'sv-SE', 'ta', 'te', 'th', 'tr', 'trs',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'xh', 'zam', 'zh-CN', 'zh-TW'
+        ),
+        'package_name': 'org.mozilla.fennec_aurora',
+        'version_code': '2015605651',
+    },
+    'x86_64.apk': {
+        'api_level': 21,
+        'architecture': 'x86_64',
+        'firefox_version': '67.0a1',
+        'firefox_build_id': '20190115103851',
+        'locales': (
+            'an', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn-BD', 'bn-IN', 'br', 'bs', 'ca', 'cak',
+            'cs', 'cy', 'da', 'de', 'dsb', 'el', 'en-CA', 'en-GB', 'en-US', 'en-ZA', 'eo', 'es-AR',
+            'es-CL', 'es-ES', 'es-MX', 'et', 'eu', 'fa', 'ff', 'fi', 'fr', 'fy-NL', 'ga-IE', 'gd',
+            'gl', 'gn', 'gu-IN', 'he', 'hi-IN', 'hr', 'hsb', 'hu', 'hy-AM', 'id', 'is', 'it', 'ja',
+            'ka', 'kab', 'kk', 'kn', 'ko', 'lij', 'lo', 'lt', 'lv', 'mai', 'ml', 'mr', 'ms', 'my',
+            'nb-NO', 'ne-NP', 'nl', 'nn-NO', 'oc', 'or', 'pa-IN', 'pl', 'pt-BR', 'pt-PT', 'rm',
+            'ro', 'ru', 'sk', 'sl', 'son', 'sq', 'sr', 'sv-SE', 'ta', 'te', 'th', 'tr', 'trs',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'xh', 'zam', 'zh-CN', 'zh-TW'
+        ),
+        'package_name': 'org.mozilla.fennec_aurora',
+        'version_code': '2015605655',
+    },
+}, {
     'Focus.apk': {
         'api_level': 21,
         'architecture': 'armeabi-v7',
@@ -332,6 +405,23 @@ def test_bad_check_piece_of_metadata_is_unique(apks_metadata_per_paths):
     'x86.apk': {
         'version_code': '2',
         'architecture': 'x86',
+    },
+}, {
+    'arm.apk': {
+        'version_code': '0',
+        'architecture': 'armeabi-v7a',
+    },
+    'arm64.apk': {
+        'version_code': '1',
+        'architecture': 'arm64-v8a',
+    },
+    'x86.apk': {
+        'version_code': '2',
+        'architecture': 'x86',
+    },
+    'x86_64.apk': {
+        'version_code': '3',
+        'architecture': 'x86_64',
     },
 }))
 def test_check_apks_version_codes_are_correctly_ordered(apks_metadata_per_paths):
