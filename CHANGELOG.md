@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.14.1] - 2019-02-12
+
+### Added
+* x86_64 push
+
+
 ## [0.14.0] - 2019-01-29
 
 ### Changed
