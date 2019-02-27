@@ -138,9 +138,8 @@ google-auth-httplib2==0.0.3 \
 google-auth==1.6.3 \
     --hash=sha256:0f7c6a64927d34c1a474da92cfc59e552a5d3b940d3266606c6a28b72888b9e4 \
     --hash=sha256:20705f6803fd2c4d1cc2dcb0df09d4dfcb9a7d51fd59e94a3a28231fd93119ed    # via google-api-python-client, google-auth-httplib2
-httplib2==0.12.0 \
-    --hash=sha256:f61fb838a94ce3b349aa32c92fd8430f7e3511afdb18bf9640d647e30c90a6d6 \
-    # via google-api-python-client, google-auth-httplib2, oauth2client
+httplib2==0.12.1 \
+    --hash=sha256:4ba6b8fd77d0038769bf3c33c9a96a6f752bc4cdf739701fdcaf210121f399d4    # via google-api-python-client, google-auth-httplib2, oauth2client
 humanize==0.5.1 \
     --hash=sha256:a43f57115831ac7c70de098e6ac46ac13be00d69abbf60bdcac251344785bb19
 idna-ssl==1.1.0 \
