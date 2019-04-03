@@ -293,10 +293,9 @@ mccabe==0.6.1 \
 mock==2.0.0 \
     --hash=sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1 \
     --hash=sha256:b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba
-more-itertools==6.0.0 \
-    --hash=sha256:0125e8f60e9e031347105eb1682cef932f5e97d7b9a1a28d9bf00c22a5daef40 \
-    --hash=sha256:590044e3942351a1bdb1de960b739ff4ce277960f2425ad4509446dbace8d9d1 \
-    # via pytest
+more-itertools==7.0.0 \
+    --hash=sha256:2112d2ca570bb7c3e53ea1a35cd5df42bb0fd10c45f0fb97178679c3c03d64c7 \
+    --hash=sha256:c3e4748ba1aad8dba30a4886b0b1a2004f9a863837b8654e7059eebf727afa5a    # via pytest
 mozilla-version==0.3.1 \
     --hash=sha256:d6966725bd22eb08c56964a03821307b263709c742d7621f66229a9d691534fe \
     --hash=sha256:f800c484efee3c52ada9f36ea0a6ca068810e7ee05b8f3a8e0ab6953f272ad86
