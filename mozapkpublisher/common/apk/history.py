@@ -8,7 +8,9 @@ logger = logging.getLogger(__name__)
 _MAJOR_FIREFOX_VERSIONS_PER_ARCHITECTURE_AND_API_LEVEL = {
     'arm64-v8a': {      # Bug 1368484
         21: {
-            'first_firefox_version': 66,
+            # XXX AArch64 first shipped in Nightly 66, but started to ride the trains in 68.
+            # Logic for 66 and 67 is down below.
+            'first_firefox_version': 68,
         },
     },
     'armeabi-v7a': {    # Bug 618789
@@ -79,12 +81,12 @@ def get_expected_api_levels(firefox_version, architecture='armeabi-v7a'):
         api_level
         for api_level, range_dict in _MAJOR_FIREFOX_VERSIONS_PER_ARCHITECTURE_AND_API_LEVEL[architecture].items()
         if (
-            _is_firefox_version_in_range(firefox_version, range_dict) and
-            # XXX arm64-v8a (aka AArch64) is not planned to ride trains regularly. It may need
-            # a couple of cycles to stabilize. That's why we just expect it on Nightly, for now.
+            _is_firefox_version_in_range(firefox_version, range_dict) or
+            # XXX arm64-v8a shipped on Nightly only between 66 and 67.
             (
-                architecture != 'arm64-v8a' or
-                architecture == 'arm64-v8a' and is_firefox_version_nightly(firefox_version)
+                architecture == 'arm64-v8a' and
+                get_firefox_major_version_number(firefox_version) in (66, 67) and
+                is_firefox_version_nightly(firefox_version)
             )
         )
     ]
