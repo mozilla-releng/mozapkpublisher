@@ -334,9 +334,8 @@ multidict==4.5.2 \
     --hash=sha256:d3be11ac43ab1a3e979dac80843b42226d5d3cccd3986f2e03152720a4297cd7 \
     --hash=sha256:db603a1c235d110c860d5f39988ebc8218ee028f07a7cbc056ba6424372ca31b \
     # via aiohttp, yarl
-networkx==2.2 \
-    --hash=sha256:45e56f7ab6fe81652fb4bc9f44faddb0e9025f469f602df14e3b2551c2ea5c8b \
-    # via androguard
+networkx==2.3 \
+    --hash=sha256:8311ddef63cf5c5c5e7c1d0212dd141d9a1fe3f474915281b73597ed5f1d4e3d    # via androguard
 numpy==1.16.2 \
     --hash=sha256:1980f8d84548d74921685f68096911585fee393975f53797614b34d4f409b6da \
     --hash=sha256:22752cd809272671b273bb86df0f505f505a12368a3a5fc0aa811c7ece4dfd5c \
