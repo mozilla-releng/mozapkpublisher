@@ -24,7 +24,7 @@ setup(
     license='MPL2',
     install_requires=requirements,
     classifiers=(
-        'Development Status :: 3 - Alpha',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ),
 )
