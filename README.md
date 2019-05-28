@@ -4,7 +4,7 @@ Scripts to publish Firefox for Android on Google Play Store.
 
 ## Setup and run
 
-1. :warning: You need Python >= 3.5 to run this set of scripts. Python 2 isn't supported starting version 0.5.0
+1. :warning: You need Python >= 3.6 to run this set of scripts. Python 2 isn't supported starting version 0.5.0. Python 3.5 was removed in version 3.0.0.
 1. Create a virtualenv and source it
 ```sh
 virtualenv -p python3 venv
