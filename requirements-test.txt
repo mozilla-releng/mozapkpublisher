@@ -61,10 +61,9 @@ backcall==0.1.0 \
     --hash=sha256:38ecd85be2c1e78f77fd91700c76e14667dc21e2713b63876c0eb901196e01e4 \
     --hash=sha256:bbbf4b1e5cd2bdb08f915895b51081c041bac22394fdfcfdfbe9f14b77c08bf2 \
     # via ipython
-cachetools==3.1.0 \
-    --hash=sha256:219b7dc6024195b6f2bc3d3f884d1fef458745cd323b04165378622dcc823852 \
-    --hash=sha256:9efcc9fab3b49ab833475702b55edd5ae07af1af7a4c627678980b45e459c460 \
-    # via google-auth
+cachetools==3.1.1 \
+    --hash=sha256:428266a1c0d36dc5aca63a2d7c5942e88c2c898d72139fca0e97fdd2380517ae \
+    --hash=sha256:8ea2d3ce97850f31e4a08b0e2b5e6c34997d7216a9d2c98e0f3978630d4da69a    # via google-auth
 certifi==2019.6.16 \
     --hash=sha256:046832c04d4e752f37383b628bc601a7ea7211496b4638f6514d0e5b9acc4939 \
     --hash=sha256:945e3ba63a0b9f577b1395204e13c3a231f9bc0223888be653286534e5873695    # via requests
