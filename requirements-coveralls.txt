@@ -53,9 +53,9 @@ coverage==4.5.3 \
     --hash=sha256:f46087bbd95ebae244a0eda01a618aff11ec7a069b15a3ef8f6b520db523dcf1 \
     --hash=sha256:f8019c5279eb32360ca03e9fac40a12667715546eed5c5eb59eb381f2f501260 \
     --hash=sha256:fc5f4d209733750afd2714e9109816a29500718b32dd9a5db01c0cb3a019b96a    # via coveralls
-coveralls==1.7.0 \
-    --hash=sha256:baa26648430d5c2225ab12d7e2067f75597a4b967034bba7e3d5ab7501d207a1 \
-    --hash=sha256:ff9b7823b15070f26f654837bb02a201d006baaf2083e0514ffd3b34a3ffed81
+coveralls==1.8.1 \
+    --hash=sha256:d3d49234bffd41e91b241a69f0ebb9f64d7f0515711a76134d53d4647e7eb509 \
+    --hash=sha256:dafabcff87425fa2ab3122dee21229afbb4d6692cfdacc6bb895f7dfa8b2c849
 docopt==0.6.2 \
     --hash=sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491 \
     # via coveralls
