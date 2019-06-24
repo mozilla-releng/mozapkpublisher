@@ -198,6 +198,10 @@ idna==2.8 \
     --hash=sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407 \
     --hash=sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c \
     # via requests, yarl
+idna-ssl==1.1.0 \
+    --hash=sha256:a933e3bb13da54383f9e8f35dc4f9cb9eb9b3b78c6b36f311254d6d0d92c6c7c \
+    ; python_version < "3.7" \
+    # via aiohttp
 importlib-metadata==0.18 \
     --hash=sha256:6dfd58dfe281e8d240937776065dd3624ad5469c835248219bd16cf2e12dbeb7 \
     --hash=sha256:cb6ee23b46173539939964df59d3d72c3e0c1b5d54b84f1d8a7e912fe43612db \
@@ -455,6 +459,12 @@ traitlets==4.3.2 \
     --hash=sha256:9c4bd2d267b7153df9152698efb1050a5d84982d3384a37b2c1f7723ba3e7835 \
     --hash=sha256:c6cb5e6f57c5a9bdaa40fa71ce7b4af30298fbab9ece9815b5d995ab6217c7d9 \
     # via ipython
+typing-extensions==3.7.2 \
+    --hash=sha256:07b2c978670896022a43c4b915df8958bec4a6b84add7f2c87b2b728bda3ba64 \
+    --hash=sha256:f3f0e67e1d42de47b5c67c32c9b26641642e9170fe7e292991793705cd5fef7c \
+    --hash=sha256:fb2cd053238d33a8ec939190f30cfd736c00653a85a2919415cecf7dc3d9da71 \
+    ; python_version < "3.7" \
+    # via aiohttp
 uritemplate==3.0.0 \
     --hash=sha256:01c69f4fe8ed503b2951bef85d996a9d22434d2431584b5b107b2981ff416fbd \
     --hash=sha256:1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd \
