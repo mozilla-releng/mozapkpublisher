@@ -10,10 +10,8 @@ from mozapkpublisher.common.googleplay import connection_for_options, WritableGo
 logger = logging.getLogger(__name__)
 
 
-def update_apk_description(package_name, force_locale, commit, service_account, google_play_credentials_file,
-                           contact_google_play):
-    connection = connection_for_options(contact_google_play, service_account, google_play_credentials_file)
-    with WritableGooglePlay.transaction(connection, package_name, do_not_commit=not commit) as google_play:
+def update_apk_description(connection, package_name, force_locale, commit):
+    with WritableGooglePlay.transaction(connection, package_name, commit) as google_play:
         moz_locales = [force_locale] if force_locale else None
         l10n_strings = store_l10n.get_translations_per_google_play_locale_code(package_name, moz_locales)
         create_or_update_listings(google_play, l10n_strings)
@@ -48,8 +46,9 @@ def main():
                         help='The Google play name of the app', required=True)
     parser.add_argument('--force-locale', help='Force to a specific locale (instead of all)')
     config = parser.parse_args()
-    update_apk_description(config.package_name, config.force_locale, config.commit, config.service_account,
-                           config.google_play_credentials_file, config.contact_google_play)
+    connection = connection_for_options(config.contact_google_play, config.service_account,
+                                        config.google_play_credentials_file)
+    update_apk_description(connection, config.package_name, config.force_locale, config.commit)
 
 
 __name__ == '__main__' and main()

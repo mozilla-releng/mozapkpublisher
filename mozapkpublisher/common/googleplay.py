@@ -30,10 +30,33 @@ from mozapkpublisher.common.exceptions import WrongArgumentGiven
 logger = logging.getLogger(__name__)
 
 
+class RolloutTrack:
+    def __init__(self, percentage):
+        if not (1.0 >= percentage > 0):
+            raise ValueError('Rollout percentage must be (0.0, 1.0]')
+        self.name = 'rollout'
+        self.percentage = percentage
+
+    def __eq__(self, other):
+        if isinstance(other, RolloutTrack):
+            return self.name == other.name
+        return False
+
+
+class StaticTrack:
+    def __init__(self, name):
+        self.name = name
+
+    def __eq__(self, other):
+        if isinstance(other, StaticTrack):
+            return self.name == other.name
+        return False
+
+
 def add_general_google_play_arguments(parser):
-    parser.add_argument('--service-account', help='The service account email', required=True)
+    parser.add_argument('--service-account', help='The service account email')
     parser.add_argument('--credentials', dest='google_play_credentials_file', type=argparse.FileType(mode='rb'),
-                        help='The p12 authentication file', required=True)
+                        help='The p12 authentication file')
 
     parser.add_argument('--commit', action='store_true',
                         help='Commit changes onto Google Play. This action cannot be reverted.')
@@ -98,15 +121,21 @@ class MockGooglePlayConnection:
         update_mock.update = lambda *args, **kwargs: _ExecuteDummy('fake-update-response')
         edit_service_mock.tracks = lambda *args, **kwargs: update_mock
         edit_service_mock.listings = lambda *args, **kwargs: update_mock
-        edit_service_mock.apklistings = lambda *args, **kwargs: update_mock
 
         return edit_service_mock
 
 
 def connection_for_options(contact_google_play, service_account, credentials_file):
     if contact_google_play:
+        if service_account is None or credentials_file is None:
+            raise WrongArgumentGiven("Either provide '--service-account' and '--credentials', or avoid communication "
+                                     "with the real Google Play with '--do-not-contact-google-play'")
         return GooglePlayConnection.open(service_account, credentials_file.name)
     else:
+        if service_account is not None or credentials_file is not None:
+            raise WrongArgumentGiven("When using '--do-not-contact-google-play', do not use '--service-account' or "
+                                     "'--credentials'")
+
         logger.warning('Not a single request to Google Play will be made, since `contact_google_play` was set')
         return MockGooglePlayConnection()
 
@@ -122,13 +151,13 @@ class ReadOnlyGooglePlay:
         self._edit_id = edit_id
         self._package_name = package_name
 
-    def get_track_status(self, track):
+    def get_rollout_status(self):
         response = self._edit_resource.tracks().get(
             editId=self._edit_id,
-            track=track,
+            track='production',
             packageName=self._package_name
         ).execute()
-        logger.debug('Track "{}" has status: {}'.format(track, response))
+        logger.debug('Track "production" has status: {}'.format(response))
         return response
 
     @staticmethod
@@ -177,25 +206,21 @@ class WritableGooglePlay(ReadOnlyGooglePlay):
                     return
             raise
 
-    def update_track(self, track, version_codes, rollout_percentage=None):
+    def update_track(self, track, version_codes):
         body = {
             u'releases': [{
                 u'status': 'completed',
                 u'versionCodes': version_codes,
             }],
         }
-        if rollout_percentage is not None:
-            if rollout_percentage < 0 or rollout_percentage > 100:
-                raise WrongArgumentGiven(
-                    'rollout percentage must be between 0 and 100. Value given: {}'.format(
-                        rollout_percentage))
 
-            body[u'userFraction'] = rollout_percentage / 100.0  # Ensure float in Python 2
+        if isinstance(track, RolloutTrack):
+            body[u'userFraction'] = track.percentage
 
         response = self._edit_resource.tracks().update(
-            editId=self._edit_id, track=track, packageName=self._package_name, body=body
+            editId=self._edit_id, track=track.name, packageName=self._package_name, body=body
         ).execute()
-        logger.info('Track "{}" updated with: {}'.format(track, body))
+        logger.info('Track "{}" updated with: {}'.format(track.name, body))
         logger.debug('Track update response: {}'.format(response))
 
     def update_listings(self, language, title, full_description, short_description):
@@ -210,26 +235,16 @@ class WritableGooglePlay(ReadOnlyGooglePlay):
         logger.info(u'Listing for language "{}" has been updated with: {}'.format(language, body))
         logger.debug(u'Listing response: {}'.format(response))
 
-    def update_whats_new(self, language, apk_version_code, whats_new):
-        response = self._edit_resource.apklistings().update(
-            editId=self._edit_id, packageName=self._package_name, language=language,
-            apkVersionCode=apk_version_code, body={'recentChanges': whats_new}
-        ).execute()
-        logger.info(u'What\'s new listing for ("{}", "{}") has been updated to: "{}"'.format(
-            language, apk_version_code, whats_new
-        ))
-        logger.debug(u'Apk listing response: {}'.format(response))
-
     @staticmethod
     @contextmanager
-    def transaction(connection, package_name, do_not_commit=False):
+    def transaction(connection, package_name, commit):
         edit_resource = connection.get_edit_resource()
         edit_id = edit_resource.insert(body={}, packageName=package_name).execute()['id']
         google_play = WritableGooglePlay(edit_resource, edit_id, package_name)
         yield google_play
-        if do_not_commit:
-            logger.warning('Transaction not committed, since `do_not_commit` was set')
-        else:
+        if commit:
             edit_resource.commit(editId=edit_id, packageName=package_name)
             logger.info('Changes committed')
             logger.debug('edit_id "{}" for "{}" has been committed'.format(edit_id, package_name))
+        else:
+            logger.warning('Transaction not committed, since `do_not_commit` was set')

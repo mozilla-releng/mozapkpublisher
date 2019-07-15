@@ -6,20 +6,17 @@ import logging
 from mozapkpublisher.common import googleplay, main_logging
 from mozapkpublisher.common.apk import add_apk_checks_arguments, extract_and_check_apks_metadata
 from mozapkpublisher.common.exceptions import WrongArgumentGiven
-from mozapkpublisher.common.googleplay import WritableGooglePlay, connection_for_options
+from mozapkpublisher.common.googleplay import WritableGooglePlay, connection_for_options, RolloutTrack, StaticTrack
 
 logger = logging.getLogger(__name__)
 
 
 def push_apk(
     apks,
-    service_account,
-    google_play_credentials_file,
+    connection,
     track,
     expected_package_names,
-    rollout_percentage=None,
     commit=True,
-    contact_google_play=True,
     skip_check_ordered_version_codes=False,
     skip_check_multiple_locales=False,
     skip_check_same_locales=False,
@@ -29,16 +26,10 @@ def push_apk(
 
     Args:
         apks: list of APK files
-        service_account: Google Play service account
-        google_play_credentials_file: Credentials file to authenticate to Google Play
-        track (str): Google Play track to deploy to (e.g.: "nightly"). If "rollout" is chosen, the parameter
-            `rollout_percentage` must be specified as well
+        connection (typing.Union[GooglePlayConnection, MockGooglePlayConnection]): connection to Google Play
+        track (typing.Union[StaticTrack, RolloutTrack]): Google Play track to deploy to (e.g.: StaticTrack("nightly")).
         expected_package_names (list of str): defines what the expected package name must be.
-        rollout_percentage (int): percentage of users to roll out this update to. Must be a number between [0-100].
-            This option is only valid if `track` is set to "rollout"
         commit (bool): `False` to do a dry-run
-        contact_google_play (bool): `False` to avoid communicating with Google Play. Useful if you're using mock
-            credentials.
         skip_checks_fennec (bool): skip Fennec-specific checks
         skip_check_same_locales (bool): skip check to ensure all APKs have the same locales
         skip_check_multiple_locales (bool): skip check to ensure all APKs have more than one locale
@@ -49,11 +40,6 @@ def push_apk(
     # We want to tune down some logs, even when push_apk() isn't called from the command line
     main_logging.init()
 
-    if track == 'rollout' and rollout_percentage is None:
-        raise WrongArgumentGiven("When using track='rollout', rollout percentage must be provided too")
-    if rollout_percentage is not None and track != 'rollout':
-        raise WrongArgumentGiven("When using rollout-percentage, track must be set to rollout")
-
     apks_metadata_per_paths = extract_and_check_apks_metadata(
         apks,
         expected_package_names,
@@ -63,22 +49,16 @@ def push_apk(
         skip_check_ordered_version_codes,
     )
 
-    # TODO make programmatic usage of this library provide a "GooglePlayConnection" object, rather
-    # than having to provide redundant information like "service_account" and "credentials" when
-    # "contact_google_play" is false
-    connection = connection_for_options(contact_google_play, service_account, google_play_credentials_file)
-
     # Each distinct product must be uploaded in different Google Play transaction, so we split them
     # by package name here.
     split_apk_metadata = _split_apk_metadata_per_package_name(apks_metadata_per_paths)
     for (package_name, apks_metadata) in split_apk_metadata.items():
-        with WritableGooglePlay.transaction(connection, package_name,
-                                            do_not_commit=not commit) as google_play:
+        with WritableGooglePlay.transaction(connection, package_name, commit) as google_play:
             for path, metadata in apks_metadata_per_paths.items():
                 google_play.upload_apk(path)
 
             all_version_codes = _get_ordered_version_codes(apks_metadata_per_paths)
-            google_play.update_track(track, all_version_codes, rollout_percentage)
+            google_play.update_track(track, all_version_codes)
 
 
 def _split_apk_metadata_per_package_name(apks_metadata_per_paths):
@@ -119,16 +99,25 @@ def main():
 
     config = parser.parse_args()
 
+    if config.track == 'rollout':
+        if config.rollout_percentage is None:
+            raise WrongArgumentGiven("When using '--track rollout', '--rollout-percentage' must be provided too")
+        track = RolloutTrack(config.rollout_percentage / 100.0)
+    else:
+        if config.rollout_percentage is not None:
+            raise WrongArgumentGiven("When using '--rollout-percentage', you must have '--track rollout'")
+        track = StaticTrack(config.track)
+
+    connection = connection_for_options(config.contact_google_play, config.service_account,
+                                        config.google_play_credentials_file)
+
     try:
         push_apk(
             config.apks,
-            config.service_account,
-            config.google_play_credentials_file,
-            config.track,
+            connection,
+            track,
             config.expected_package_names,
-            config.rollout_percentage,
             config.commit,
-            config.contact_google_play,
             config.skip_check_ordered_version_codes,
             config.skip_check_multiple_locales,
             config.skip_check_same_locales,

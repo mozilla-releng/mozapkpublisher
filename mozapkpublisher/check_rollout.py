@@ -9,7 +9,7 @@ import requests
 
 from argparse import ArgumentParser
 from mozapkpublisher.common.googleplay import add_general_google_play_arguments, \
-    ReadOnlyGooglePlay, GooglePlayConnection
+    ReadOnlyGooglePlay, connection_for_options
 
 DAY = 24 * 60 * 60
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def check_rollout(google_play, days):
     """Check if package_name has a release on staged rollout for too long"""
-    track_status = google_play.get_track_status(track='production')
+    track_status = google_play.get_rollout_status()
     releases = track_status['releases']
     for release in releases:
         if release['status'] == 'inProgress':
@@ -39,11 +39,10 @@ def main():
     parser.add_argument('--days', help='The time before we warn about incomplete staged rollout of a release (default: 7)',
                         type=int, default=7)
     config = parser.parse_args()
+    connection = connection_for_options(config.contact_google_play, config.service_account,
+                                        config.google_play_credentials_file)
 
-    google_play = ReadOnlyGooglePlay.create(GooglePlayConnection.open(
-        config.service_account,
-        config.google_play_credentials_file.name
-    ), 'org.mozilla.firefox')
+    google_play = ReadOnlyGooglePlay.create(connection, 'org.mozilla.firefox')
     for (release, age) in check_rollout(google_play, config.days):
         print('fennec {} is on staged rollout at {}% but it shipped {} days ago'.format(
               release['name'], int(release['userFraction'] * 100), int(age / DAY)))

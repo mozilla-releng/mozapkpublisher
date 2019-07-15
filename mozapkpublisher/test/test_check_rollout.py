@@ -22,7 +22,7 @@ def set_up_mocks(_requests_mock, tracks):
                         status_code=404)
 
     google_play_mock = create_autospec(googleplay.ReadOnlyGooglePlay)
-    google_play_mock.get_track_status.return_value = tracks
+    google_play_mock.get_rollout_status.return_value = tracks
     return google_play_mock
 
 

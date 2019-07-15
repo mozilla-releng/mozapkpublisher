@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 
+from mozapkpublisher.common.exceptions import WrongArgumentGiven
+
 import mozapkpublisher
 import os
 import pytest
@@ -10,7 +12,7 @@ from unittest.mock import create_autospec, MagicMock
 from tempfile import NamedTemporaryFile
 
 from mozapkpublisher.common import googleplay
-from mozapkpublisher.common.exceptions import WrongArgumentGiven
+from mozapkpublisher.common.googleplay import StaticTrack, RolloutTrack, MockGooglePlayConnection
 from mozapkpublisher.push_apk import (
     push_apk,
     main,
@@ -20,12 +22,9 @@ from mozapkpublisher.push_apk import (
 from unittest.mock import patch
 
 
-credentials = NamedTemporaryFile()
 apk_x86 = NamedTemporaryFile()
 apk_arm = NamedTemporaryFile()
-
 APKS = [apk_x86, apk_arm]
-SERVICE_ACCOUNT = 'foo@developer.gserviceaccount.com'
 
 
 @pytest.fixture
@@ -82,26 +81,6 @@ def set_up_mocks(monkeypatch_, writable_google_play_mock_):
     monkeypatch_.setattr('mozapkpublisher.push_apk.extract_and_check_apks_metadata', _metadata)
 
 
-def test_invalid_rollout_percentage():
-    with pytest.raises(WrongArgumentGiven):
-        # missing percentage
-        push_apk(APKS, SERVICE_ACCOUNT, credentials, 'rollout', [])
-
-    valid_percentage = 1
-    invalid_track = 'production'
-    with pytest.raises(WrongArgumentGiven):
-        push_apk(APKS, SERVICE_ACCOUNT, credentials, invalid_track, [], rollout_percentage=valid_percentage)
-
-
-def test_valid_rollout_percentage(writable_google_play_mock, monkeypatch):
-    set_up_mocks(monkeypatch, writable_google_play_mock)
-    valid_percentage = 50
-
-    push_apk(APKS, SERVICE_ACCOUNT, credentials, 'rollout', [], rollout_percentage=valid_percentage, contact_google_play=False)
-    writable_google_play_mock.update_track.assert_called_once_with('rollout', ['0', '1'], valid_percentage)
-    writable_google_play_mock.update_track.reset_mock()
-
-
 def test_get_ordered_version_codes():
     assert _get_ordered_version_codes({
         'x86': {
@@ -116,12 +95,12 @@ def test_get_ordered_version_codes():
 def test_upload_apk(writable_google_play_mock, monkeypatch):
     set_up_mocks(monkeypatch, writable_google_play_mock)
 
-    push_apk(APKS, SERVICE_ACCOUNT, credentials, 'alpha', [], contact_google_play=False)
+    push_apk(APKS, MockGooglePlayConnection(), StaticTrack('alpha'), [])
 
     for apk_file in (apk_arm, apk_x86):
         writable_google_play_mock.upload_apk.assert_any_call(apk_file.name)
 
-    writable_google_play_mock.update_track.assert_called_once_with('alpha', ['0', '1'], None)
+    writable_google_play_mock.update_track.assert_called_once_with(StaticTrack('alpha'), ['0', '1'])
 
 
 def test_get_distinct_package_name_apk_metadata():
@@ -168,7 +147,7 @@ def test_push_apk_tunes_down_logs(monkeypatch):
     monkeypatch.setattr('mozapkpublisher.push_apk.extract_and_check_apks_metadata', MagicMock())
     monkeypatch.setattr('mozapkpublisher.push_apk._split_apk_metadata_per_package_name', MagicMock())
 
-    push_apk(APKS, SERVICE_ACCOUNT, credentials, 'alpha', [], contact_google_play=False)
+    push_apk(APKS, MockGooglePlayConnection(), StaticTrack('alpha'), [])
 
     main_logging_mock.init.assert_called_once_with()
 
@@ -180,9 +159,45 @@ def test_main_bad_arguments_status_code(monkeypatch):
     assert exception.value.code == 2
 
 
+@pytest.mark.parametrize('flags', (
+        (['--track', 'rollout']),
+        (['--track', 'production', '--rollout-percentage', '50']),
+        (['--track', 'nightly', '--rollout-percentage', '1']),
+))
+def test_parse_invalid_track(monkeypatch, flags):
+    file = os.path.join(os.path.dirname(__file__), 'data', 'blob')
+    args = [
+        'script',
+        '--expected-package-name', 'org.mozilla.fennec_aurora', '--do-not-contact-google-play'
+    ] + flags + [file]
+    monkeypatch.setattr(sys, 'argv', args)
+
+    with pytest.raises(WrongArgumentGiven):
+        main()
+
+
+@pytest.mark.parametrize('flags,expected_track', (
+        (['--track', 'rollout', '--rollout-percentage', '50'], RolloutTrack(0.50)),
+        (['--track', 'production'], StaticTrack('production')),
+        (['--track', 'nightly'], StaticTrack('nightly')),
+))
+def test_parse_valid_track(monkeypatch, flags, expected_track):
+    file = os.path.join(os.path.dirname(__file__), 'data', 'blob')
+    args = [
+        'script',
+        '--expected-package-name', 'org.mozilla.fennec_aurora', '--do-not-contact-google-play'
+    ] + flags + [file]
+    monkeypatch.setattr(sys, 'argv', args)
+
+    with patch.object(mozapkpublisher.push_apk, 'push_apk') as mock_push_apk:
+        main()
+        mock_push_apk.assert_called_once()
+        assert mock_push_apk.call_args[0][2] == expected_track
+
+
 def test_main(monkeypatch):
     incomplete_args = [
-        '--package-name', 'org.mozilla.fennec_aurora', '--track', 'alpha',
+        'script', '--expected-package-name', 'org.mozilla.fennec_aurora', '--track', 'alpha',
         '--service-account', 'foo@developer.gserviceaccount.com',
     ]
 
@@ -190,21 +205,3 @@ def test_main(monkeypatch):
 
     with pytest.raises(SystemExit):
         main()
-
-    file = os.path.join(os.path.dirname(__file__), 'data', 'blob')
-    fail_manual_validation_args = [
-        'script',
-        '--track', 'rollout',
-        '--service-account', 'foo@developer.gserviceaccount.com',
-        '--credentials', file,
-        '--expected-package-name', 'org.mozilla.fennec_aurora',
-        file
-    ]
-
-    with patch.object(mozapkpublisher.push_apk, 'push_apk', wraps=mozapkpublisher.push_apk.push_apk) as mock_push_apk:
-        monkeypatch.setattr(sys, 'argv', fail_manual_validation_args)
-
-        with pytest.raises(SystemExit):
-            main()
-
-        assert mock_push_apk.called

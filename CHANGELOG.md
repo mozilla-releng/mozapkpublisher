@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 * Separates read-only logic from logic that requires a transaction
+* `--service-account` and `--credentials` is now only required if `--do-not-contact-google-play` isn't provided
+* `push_apk` and `update_apk_description` now accept types for `track` and `connection`, rather than mutually-exclusive primitive parameters 
+
+### Fixed
+* `check_rollout` no longer ignores `--do-not-contact-google-play`
 
 ## [4.1.0] - 2019-07-10
 ### Removed
