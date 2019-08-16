@@ -103,10 +103,7 @@ class GooglePlayEdit:
 
     def update_track(self, track, version_codes, rollout_percentage=None):
         body = {
-            u'releases': [{
-                u'status': 'completed',
-                u'versionCodes': version_codes,
-            }],
+            u'versionCodes': version_codes,
         }
         if rollout_percentage is not None:
             if rollout_percentage < 0 or rollout_percentage > 100:
@@ -175,7 +172,7 @@ def edit_resource_for_options(contact_google_play, service_account, credentials_
         http = httplib2.Http()
         http = credentials.authorize(http)
 
-        service = build(serviceName='androidpublisher', version='v3', http=http,
+        service = build(serviceName='androidpublisher', version='v2', http=http,
                         cache_discovery=False)
 
         return service.edits()

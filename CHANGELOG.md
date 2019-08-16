@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [upcoming]
+## [5.0.0]
 
 ### Changed
 * Uses RAII to represent operations that require an "edit"
+* Reverts back to `android-publisher` API v2 to circumvent [rollout issue](https://github.com/mozilla-releng/mozapkpublisher/issues/220)
 
 ## [4.1.0] - 2019-07-10
 ### Removed

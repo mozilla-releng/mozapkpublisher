@@ -164,10 +164,7 @@ def test_update_track(edit_resource_mock):
         packageName='dummy_package_name',
         track='alpha',
         body={
-            'releases': [{
-                'status': 'completed',
-                'versionCodes': ['2015012345', '2015012347'],
-            }],
+            'versionCodes': ['2015012345', '2015012347'],
         },
     )
 
@@ -178,10 +175,7 @@ def test_update_track(edit_resource_mock):
         packageName='dummy_package_name',
         track='rollout',
         body={
-            'releases': [{
-                'status': 'completed',
-                'versionCodes': ['2015012345', '2015012347']},
-            ],
+            'versionCodes': ['2015012345', '2015012347'],
             'userFraction': 0.01,
         },
     )
