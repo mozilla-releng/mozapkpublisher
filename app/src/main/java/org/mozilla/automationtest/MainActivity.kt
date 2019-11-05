@@ -10,6 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val versionInfo = packageManager.getPackageInfo(packageName, 0)
-        versionText.text = versionInfo.versionCode.toString()
+        versionText.text = "versionCode: " + versionInfo.versionCode.toString()
     }
 }
