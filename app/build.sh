@@ -11,10 +11,13 @@ if ! compgen -G "$ANDROID_HOME/build-tools/*" > /dev/null; then
     exit 2
 fi
 
+version_code=$1
+keystore_path=$2
+
 build_tools_options=($ANDROID_HOME/build-tools/*)
 build_tools=${build_tools_options[-1]}
 echo $build_tools
 
-./gradlew assembleRelease -PversionCode=$1
+./gradlew assembleRelease -PversionCode=$version_code
 $build_tools/zipalign -v -p 4 build/outputs/apk/release/app-release-unsigned.apk build/outputs/apk/release/app-release-unsigned-aligned.apk
-$build_tools/apksigner sign --ks $2 --out build/outputs/apk/release/app-release.apk build/outputs/apk/release/app-release-unsigned-aligned.apk
+$build_tools/apksigner sign --ks $keystore_path --out build/outputs/apk/release/app-release.apk build/outputs/apk/release/app-release-unsigned-aligned.apk
