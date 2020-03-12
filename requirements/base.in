@@ -1,0 +1,9 @@
+aiohttp
+androguard
+google-api-python-client
+humanize
+mozilla-version
+oauth2client
+pyOpenSSL   # Even not imported once in mozapkpublisher, it's needed to open p12 files
+requests
+voluptuous

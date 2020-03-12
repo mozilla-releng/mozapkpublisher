@@ -6,7 +6,7 @@ project_dir = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(project_dir, 'version.txt')) as f:
     version = f.read().rstrip()
 
-with open(os.path.join(project_dir, 'requirements.txt.in')) as f:
+with open(os.path.join(project_dir, 'requirements/base.in')) as f:
     requirements = [
         line.split()[0]
         for line in f
