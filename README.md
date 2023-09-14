@@ -12,7 +12,8 @@ source venv/bin/activate
 ```
 1. `pip install -r requirements.txt`
 1. `python setup.py develop`
-1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/update_apk_description.py`
+1. If using push_aab.py, download `bundletool` from https://github.com/google/bundletool/releases and set environment variable `BUNDLETOOL_PATH=path/to/bundletool.jar`
+1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/push_aab.py`, or `mozapkpublisher/update_apk_description.py`
 1. Run `--help` to each of these script to know how to call them.
 
 ### Setup in Mac OSX
