@@ -37,27 +37,17 @@ source venv/bin/activate
             * `sudo ln -s /usr/local/Cellar/openssl/1.0.2j/include/openssl/ /usr/local/include/openssl`
         5. Restore original permissions on /usr/local/bin:
             * `sudo chown root:wheel /usr/local`
-1. Some errors might happen when executing `mozapkpublisher/push_apk.py`
-    1. You might have errors like
-        * Errors in from_p12_keyfile in oauth2client/service_account.py or
-        * ImportError: cannot import name `_openssl_crypt`
-            * `pip uninstall oauth2client`
-            * `pip install oauth2client==2.0.0`
-            * `pip install google-api-python-client==1.5.0`
-    1. Symbol not found: `_BIO_new_CMS`
-        * `pip uninstall cryptography`
-        * `LDFLAGS="-L/usr/local/opt/openssl/lib" pip install cryptography --no-use-wheel`
 
 ## What to do when pushapk_scriptworker doesn't work?
 
 > A guide to manually publish APKs onto Google Play Store
 
-1. Generate a Google Play Store p12 certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Nightly.
+1. Generate a Google Play Store json certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Nightly.
 1. Execute the steps defined in the section above.
 1. Download the latest signed builds. For instance, for Fennec Nightly: `./mozapkpublisher/get_apk.py --latest-nightly`
 1. 
 ```sh
-./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.p12 --service-account your-service-account@iam.gserviceaccount.com x86.apk arm.apk
+./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.json x86.apk arm.apk
 ```
 
   * Note `beta` track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for Nightly, unlike beta and release.
