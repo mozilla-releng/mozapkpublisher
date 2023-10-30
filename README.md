@@ -61,4 +61,4 @@ source venv/bin/activate
 ```
 
   * Note `beta` track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for Nightly, unlike beta and release.
-1. If all goes well, add `--commit` (or `--keep` for Amazon) to the command line and rerun it.
+1. If all goes well, add `--commit` to the command line and rerun it.
