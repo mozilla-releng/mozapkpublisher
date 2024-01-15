@@ -1,5 +1,5 @@
 aiohttp
-androguard
+androguard<4
 google-api-python-client
 google-auth
 humanize
