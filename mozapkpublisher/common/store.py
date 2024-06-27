@@ -209,7 +209,8 @@ def _create_google_edit_resource(contact_google_play, credentials_file_name):
 
         service = build(serviceName='androidpublisher', version='v3',
                         credentials=credentials,
-                        cache_discovery=False)
+                        cache_discovery=False,
+                        num_retries=3)
 
         return service.edits()
     else:
