@@ -13,7 +13,7 @@ source venv/bin/activate
 1. `pip install -r requirements.txt`
 1. `python setup.py develop`
 1. If using push_aab.py, download `bundletool` from https://github.com/google/bundletool/releases and set environment variable `BUNDLETOOL_PATH=path/to/bundletool.jar`
-1. Execute either `mozapkpublisher/get_apk.py`, or `mozapkpublisher/push_apk.py`, or `mozapkpublisher/push_aab.py`, or `mozapkpublisher/update_apk_description.py`
+1. Execute either `mozapkpublisher/push_apk.py`, or `mozapkpublisher/push_aab.py`, or `mozapkpublisher/update_apk_description.py`
 1. Run `--help` to each of these script to know how to call them.
 
 ### Setup in Mac OSX
@@ -44,7 +44,7 @@ source venv/bin/activate
 
 1. Generate a Google Play Store json certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Nightly.
 1. Execute the steps defined in the section above.
-1. Download the latest signed builds. For instance, for Fennec Nightly: `./mozapkpublisher/get_apk.py --latest-nightly`
+1. Download the latest [signed builds](https://treeherder.mozilla.org/jobs?repo=mozilla-central&searchStr=signing-bundle-fenix-nightly)
 1. 
 ```sh
 ./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.json x86.apk arm.apk

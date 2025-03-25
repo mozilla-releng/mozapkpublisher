@@ -1,6 +1,5 @@
 -r base.in
 
-aioresponses
 coverage
 flake8
 pytest
