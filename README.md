@@ -44,7 +44,7 @@ source venv/bin/activate
 
 1. Generate a Google Play Store json certificate. This certificate needs to have write access to the app you want to publish. In this context, "app" means Fennec, Fennec Beta or Fennec Nightly.
 1. Execute the steps defined in the section above.
-1. Download the latest [signed builds](`https://treeherder.mozilla.org/jobs?repo=mozilla-central&searchStr=signing-apk-fenix-nightly)
+1. Download the latest [signed builds](https://treeherder.mozilla.org/jobs?repo=mozilla-central&searchStr=signing-bundle-fenix-nightly)
 1. 
 ```sh
 ./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.json x86.apk arm.apk
