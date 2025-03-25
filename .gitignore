@@ -57,3 +57,6 @@ target/
 
 # artifacts produced
 apk-download
+
+# uv
+.venv/

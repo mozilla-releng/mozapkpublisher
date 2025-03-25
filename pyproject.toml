@@ -1,0 +1,58 @@
+[project]
+name = "mozapkpublisher"
+version = "7.0.2"
+description = "Scripts to get and push Firefox for Android to Google Play Store"
+url = "https://github.com/mozilla-releng/mozapkpublisher"
+license = "MPL-2.0"
+readme = "README.md"
+authors = [
+    { name = "Mozilla Release Engineering", email = "release+python@mozilla.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "androguard<4",
+    "google-api-python-client",
+    "google-auth",
+    "humanize",
+    "mozilla-version",
+    "requests",
+    "voluptuous"
+]
+
+[dependency-groups]
+dev = [
+    "coverage",
+    "flake8",
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+    "mock",
+    "requests_mock"
+]
+coveralls = [
+    "coveralls"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope="function"
+
+[tool.hatch.build]
+exclude = [
+  "__pycache__",
+  ".github/",
+  ".pyup.yml",
+  ".coveragerc",
+  ".gitignore",
+  "*.apk",
+]
+
