@@ -5,38 +5,20 @@ Scripts to publish Firefox for Android on Google Play Store.
 ## Setup and run
 
 1. :warning: You need Python >= 3.6 to run this set of scripts. Python 2 isn't supported starting version 0.5.0. Python 3.5 was removed in version 3.0.0.
-1. Create a virtualenv and source it
-```sh
-virtualenv -p python3 venv
-source venv/bin/activate
-```
-1. `pip install -r requirements.txt`
-1. `python setup.py develop`
+1. `uv venv`
+1. `uv pip install -e .`
 1. If using push_aab.py, download `bundletool` from https://github.com/google/bundletool/releases and set environment variable `BUNDLETOOL_PATH=path/to/bundletool.jar`
 1. Execute either `mozapkpublisher/push_apk.py`, or `mozapkpublisher/push_aab.py`, or `mozapkpublisher/update_apk_description.py`
 1. Run `--help` to each of these script to know how to call them.
 
-### Setup in Mac OSX
+### Running tests
 
+1. `uv tool install tox --with tox-uv`
+1. `uv tool run tox -e py39`
 
-1. Install Xcode command line tools
-   `xcode-select --install`
-1. Create a virtualenv and source it
-1. `pip install -r requirements.txt`
-1. Some errors might happen during `python setup.py develop`
-    1. fatal error: 'openssl/opensslv.h' file not found
-        1. Temporarily adjust permissions on /usr/local so brew can update:
-            * `sudo chgrp -R admin /usr/local`
-            * `sudo chmod -R g+w /usr/local`
-        2. Install the updated version of OpenSSL (you probably use 1.0.2j):
-            * `brew install openssl`
-        3. You may want/need to delete an existing symlink to openssl from /usr/local/bin:
-            * `rm /usr/local/bin/openssl`
-        4. Re-link the proper brew version:
-            * `sudo ln -s /usr/local/Cellar/openssl/1.0.2i/bin/openssl /usr/local/bin/openssl`
-            * `sudo ln -s /usr/local/Cellar/openssl/1.0.2j/include/openssl/ /usr/local/include/openssl`
-        5. Restore original permissions on /usr/local/bin:
-            * `sudo chown root:wheel /usr/local`
+### Preparing a release
+
+1. `uv tool run hatch build`
 
 ## What to do when pushapk_scriptworker doesn't work?
 
@@ -47,7 +29,7 @@ source venv/bin/activate
 1. Download the latest [signed builds](https://treeherder.mozilla.org/jobs?repo=mozilla-central&searchStr=signing-bundle-fenix-nightly)
 1. 
 ```sh
-./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.json x86.apk arm.apk
+uv run python ./mozapkpublisher/push_apk.py --no-gp-string-update --track beta --credentials /path/to/your/googleplay/creds.json x86.apk arm.apk
 ```
 
   * Note `beta` track on Google Play, that's our way to show to people on Play Store that it's not a finished product. We don't use the "production" track for Nightly, unlike beta and release.
