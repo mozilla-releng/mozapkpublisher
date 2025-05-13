@@ -6,10 +6,12 @@ from urllib.parse import urljoin
 from io import BytesIO
 
 import aiohttp
+import logging
 import os.path
 
 BASE_DEVAPI_URL = "https://devapi.samsungapps.com/"
 BASE_SELLER_URL = "https://seller.samsungapps.com/"
+logger = logging.getLogger(__name__)
 
 
 class SamsungGalaxyStore:
@@ -17,8 +19,9 @@ class SamsungGalaxyStore:
     High level wrapper to make actions on application on the samsung galaxy store
     """
 
-    def __init__(self, service_account_id: str, access_token: str):
+    def __init__(self, service_account_id: str, access_token: str, dry_run: bool = False):
         self.api = SamsungGalaxyApi(service_account_id, access_token)
+        self._dry_run = dry_run
 
     async def __aenter__(self) -> "SamsungGalaxyStore":
         return self
@@ -45,6 +48,10 @@ class SamsungGalaxyStore:
             raise SgsUpdateException(
                 "The app with the content ID {content_id} is currently being updated. You'll have to cancel it manually before proceeding"
             )
+
+        if self._dry_run:
+            logger.warning('No APKs were uploaded since `dry_run` was `True`')
+            return
 
         current_info = content_info[0]
 
