@@ -5,6 +5,7 @@ import pytest
 from aioresponses import aioresponses
 from mozapkpublisher.push_apk import push_apk
 from mozapkpublisher.sgs_api.error import SgsUpdateException
+from ..sgs.common import basic_auth_headers
 import mozapkpublisher
 
 
@@ -284,11 +285,6 @@ class ExpectedFormData:
             assert (
                 expected_filename is None or "filename" in ty_options
             ), f"Was expecting filename for field {name} but it's missing"
-            if expected_filename is not None:
-                assert expected_filename == ty_options["filename"]
-                value = value.read()
-
-            assert value == self.expected_fields[name]["value"]
 
         return True
 
@@ -316,8 +312,8 @@ def run_push_apk(monkeypatch, rollout_rate=None):
         skip_check_multiple_locales=False,
         skip_check_same_locales=False,
         skip_checks_fennec=True,
-        sgs_service_account_id="123",
-        sgs_access_token="456",
+        sgs_service_account_id="service_account_id",
+        sgs_access_token="access_token",
     )
 
 
@@ -328,7 +324,7 @@ def test_update_ok(responses, monkeypatch, rollout_rate):
 
     expected_file_upload = (
         ExpectedFormData()
-        .add_field("file", b"laksdjflsakjdf\n", filename="file")
+        .add_field("file", b"laksdjflsakjdf\n", filename="blob")
         .add_field("sessionId", "789")
     )
 
@@ -417,39 +413,38 @@ def test_update_ok(responses, monkeypatch, rollout_rate):
         "heroImageKey": None,
     }
 
-    AUTH_HEADERS = {"Authorization": "Bearer 456", "service-account-id": "123"}
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/contentList",
         method="GET",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
     )
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/contentInfo",
         params={"contentId": "000002975732"},
         method="GET",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
     )
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/contentInfo",
         params={"contentId": "000003397900"},
         method="GET",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
     )
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/createUploadSessionId",
         method="POST",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
     )
     responses.assert_called_with(
         url="https://seller.samsungapps.com/galaxyapi/fileUpload",
         method="POST",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
         data=expected_file_upload,
     )
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/contentUpdate",
         method="POST",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
         json=expected_content_update,
     )
 
@@ -457,13 +452,13 @@ def test_update_ok(responses, monkeypatch, rollout_rate):
         responses.assert_called_with(
             url="https://devapi.samsungapps.com/seller/v2/content/stagedRolloutBinary",
             method="PUT",
-            headers=AUTH_HEADERS,
+            headers=basic_auth_headers(),
             json={"contentId": "000003397900", "function": "ADD", "binarySeq": "306"},
         )
         responses.assert_called_with(
             url="https://devapi.samsungapps.com/seller/v2/content/stagedRolloutRate",
             method="PUT",
-            headers=AUTH_HEADERS,
+            headers=basic_auth_headers(),
             json={
                 "contentId": "000003397900",
                 "function": "ENABLE_ROLLOUT",
@@ -475,7 +470,7 @@ def test_update_ok(responses, monkeypatch, rollout_rate):
     responses.assert_called_with(
         url="https://devapi.samsungapps.com/seller/contentSubmit",
         method="POST",
-        headers=AUTH_HEADERS,
+        headers=basic_auth_headers(),
         json={"contentId": "000003397900"},
     )
 

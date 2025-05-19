@@ -3,7 +3,6 @@ from .content_info import AppContentInfo
 from .utils import raise_for_status_with_message
 from .error import SgsUploadException, SgsContentInfoException, SgsUpdateException
 from urllib.parse import urljoin
-from io import BytesIO
 
 import aiohttp
 import logging
@@ -24,6 +23,7 @@ class SamsungGalaxyStore:
         self._dry_run = dry_run
 
     async def __aenter__(self) -> "SamsungGalaxyStore":
+        await self.api.__aenter__()
         return self
 
     async def __aexit__(self, *args: Any) -> None:
@@ -37,11 +37,6 @@ class SamsungGalaxyStore:
         Notes: The app needs to be in the `FOR_SALE` status and needs to not be in the middle of an update.
         """
         content_id = await self.infer_content_id_from_package_name(package_name)
-        if content_id is None:
-            raise SgsUpdateException(
-                f"Couldn't find a content ID for the following package name {package_name}."
-            )
-
         content_info = await self.api.get_content_info(content_id)
 
         if len(content_info) != 1 or content_info[0].status != "FOR_SALE":
@@ -83,13 +78,9 @@ class SamsungGalaxyStore:
 
         if rollout_rate is not None:
             # Grab the actual content as samsung requires us to
-            new_content_info = next(
-                filter(
-                    lambda ci: ci.status == "UPDATING",
-                    await self.api.get_content_info(content_id),
-                )
-            )
-            if not new_content_info:
+            try:
+                new_content_info = next(ci for ci in await self.api.get_content_info(content_id) if ci.status == "UPDATING")
+            except StopIteration:
                 raise SgsUpdateException(
                     "The API didn't return a content info with the UPDATING status. Unable to create a rollout"
                 )
@@ -126,9 +117,11 @@ class SamsungGalaxyStore:
             binaries = content_info[0].binary_list
             for binary in binaries:
                 if binary["packageName"] == package_name:
-                    return content_info[0].content_id
+                    return app["contentId"]
 
-        return None
+        raise SgsUpdateException(
+            f"Couldn't find a content ID for the following package name {package_name}."
+        )
 
 
 class SamsungGalaxyApi:
@@ -155,6 +148,7 @@ class SamsungGalaxyApi:
         return {
             "Authorization": f"Bearer {self._access_token}",
             "service-account-id": self._service_account_id,
+            "User-Agent": "mozapkpublisher",
         }
 
     async def _request(
@@ -215,7 +209,7 @@ class SamsungGalaxyApi:
 
         form = aiohttp.FormData()
         with open(file_path, "rb") as file:
-            form.add_field("file", BytesIO(file.read()), filename=file_name)
+            form.add_field("file", file)
             form.add_field("sessionId", session_id)
 
             # This API uses a different base URL for some reason
