@@ -51,9 +51,8 @@ class SamsungGalaxyStore:
         current_info = content_info[0]
 
         # Because infer_content_id_from_package_name relies on a binary with the package name existing, we know that binary_list here is not empty
-        last_binary_id = max(
-            int(binary["binarySeq"]) for binary in current_info.binary_list
-        )
+        last_binary = sorted((binary for binary in current_info.binary_list), key=lambda binary: int(binary["binarySeq"]))[-1]
+        last_binary_id = int(last_binary["binarySeq"])
 
         for apk in apks:
             fd, metadata = apk
@@ -66,8 +65,8 @@ class SamsungGalaxyStore:
                 "packageName": metadata["package_name"],
                 "apiminSdkVersion": metadata["api_level"],
                 "apimaxSdkversion": None,
-                "iapSdk": "N",
-                "gms": "Y",
+                "iapSdk": last_binary["iapSdk"],
+                "gms": last_binary["gms"],
                 "filekey": file_key,
             }
 
