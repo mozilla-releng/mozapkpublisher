@@ -41,7 +41,7 @@ class SamsungGalaxyStore:
 
         if len(content_info) != 1 or content_info[0].status != "FOR_SALE":
             raise SgsUpdateException(
-                "The app with the content ID {content_id} is currently being updated. You'll have to cancel it manually before proceeding"
+                f"The app with the content ID {content_id} is currently being updated. You'll have to cancel it manually before proceeding"
             )
 
         if self._dry_run:
