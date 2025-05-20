@@ -91,4 +91,8 @@ class AppContentInfo:
         content["addLanguage"] = None
         content["sellCountryList"] = None
 
+        # Set the publication time to manual
+        # See https://developer.samsung.com/galaxy-store/galaxy-store-developer-api/content-publish-api/reference.html
+        content["publicationType"] = "03"
+
         return content

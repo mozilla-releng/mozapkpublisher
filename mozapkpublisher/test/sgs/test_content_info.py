@@ -114,3 +114,10 @@ def test_creating_content_info_with_missing_key(key):
             AppContentInfo(new_content_info)
     else:
         AppContentInfo(new_content_info)
+
+
+def test_new_content_info_sets_publication_type_to_manual():
+    new_content_info = copy.copy(MINIMAL_VALID_CONTENT_INFO)
+    new_content_info["publicationType"] = "00"
+    content_info = AppContentInfo(new_content_info)
+    assert content_info.as_new_data()["publicationType"] == "03"
