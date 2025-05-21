@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, List
 from .content_info import AppContentInfo
 from .utils import raise_for_status_with_message
 from .error import SgsUploadException, SgsContentInfoException, SgsUpdateException
@@ -51,7 +51,7 @@ class SamsungGalaxyStore:
         current_info = content_info[0]
 
         # Because infer_content_id_from_package_name relies on a binary with the package name existing, we know that binary_list here is not empty
-        last_binary = sorted((binary for binary in current_info.binary_list), key=lambda binary: int(binary["binarySeq"]))[-1]
+        last_binary = max((binary for binary in current_info.binary_list), key=lambda binary: int(binary["binarySeq"]))
         last_binary_id = int(last_binary["binarySeq"])
 
         for apk in apks:
@@ -196,7 +196,7 @@ class SamsungGalaxyApi:
         return await self._request("POST", "/seller/createUploadSessionId")
 
     async def upload_file(
-        self, session_id: str, file_path: str, file_name: Optional[str] = None
+        self, session_id: str, file_path: str
     ) -> Dict[str, Any]:
         """
         Upload  a file required for app submission or for updating one

@@ -73,6 +73,7 @@ class AppContentInfo:
         The following transformations are applied:
             - The `startPublicationDate` field is removed
             - The `screenshots`, `addLanguage` and `sellCountryList` are nulled out as we don't support updating them and can't send them back verbatim.
+            - The `publicationType` is set to "03" to set the publication time to "manual"
         """
         self.validate()
 
