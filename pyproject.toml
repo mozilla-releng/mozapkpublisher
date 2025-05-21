@@ -16,22 +16,26 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "androguard<4",
+    "aiohttp",
     "google-api-python-client",
     "google-auth",
     "mozilla-version",
     "requests",
-    "voluptuous"
+    "voluptuous",
+    "pyjwt",
 ]
 
 [dependency-groups]
 dev = [
+    "aioresponses",
     "coverage",
     "flake8",
     "pytest",
     "pytest-cov",
     "pytest-asyncio",
     "mock",
-    "requests_mock"
+    "requests_mock",
+    "cryptography",
 ]
 coveralls = [
     "coveralls"
