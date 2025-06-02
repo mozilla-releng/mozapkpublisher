@@ -936,7 +936,7 @@ wheels = [
 
 [[package]]
 name = "mozapkpublisher"
-version = "9.0.0"
+version = "9.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
