@@ -15,11 +15,11 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "androguard<4",
     "aiohttp",
     "google-api-python-client",
     "google-auth",
     "mozilla-version",
+    "pyaxmlparser",
     "requests",
     "voluptuous",
     "pyjwt",
