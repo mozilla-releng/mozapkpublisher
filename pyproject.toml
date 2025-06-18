@@ -21,7 +21,6 @@ dependencies = [
     "mozilla-version",
     "pyaxmlparser",
     "requests",
-    "voluptuous",
     "pyjwt",
 ]
 
