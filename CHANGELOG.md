@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * `push_apk` no longers submits the samsung udpates automatically. Use `--submit` to keep the old behavior.
-* The androguard dependency has been replace with pyaxmlparser to reduce the number of transitive dependencies pulled by mozapkpublisher
+* The androguard dependency has been replaced with pyaxmlparser to reduce the number of transitive dependencies pulled by mozapkpublisher
 
 ### Removed
 
