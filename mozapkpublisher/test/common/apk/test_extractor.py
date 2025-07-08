@@ -105,6 +105,33 @@ def test_extract_metadata(monkeypatch):
             'version_name': '129.0',
         }
 
+        assert extract_metadata(apk_file, True, False) == {
+            'api_level': 16,
+            'architecture': 'x86',
+            'locales': ('an', 'as', 'bn-IN', 'en-GB', 'en-US'),
+            'package_name': 'org.mozilla.firefox',
+            'version_code': '2015523300',
+            'version_name': '129.0',
+        }
+
+        assert extract_metadata(apk_file, False, True) == {
+            'api_level': 16,
+            'architecture': 'x86',
+            'firefox_build_id': '20171112125738',
+            'firefox_version': '57.0',
+            'package_name': 'org.mozilla.firefox',
+            'version_code': '2015523300',
+            'version_name': '129.0',
+        }
+
+        assert extract_metadata(apk_file, False, False) == {
+            'api_level': 16,
+            'architecture': 'x86',
+            'package_name': 'org.mozilla.firefox',
+            'version_code': '2015523300',
+            'version_name': '129.0',
+        }
+
 
 @pytest.mark.parametrize('architecture', (('x86', 'armeabi-v7a')))
 def test_get_apk_architecture(architecture):
