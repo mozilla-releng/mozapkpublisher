@@ -18,7 +18,11 @@ Scripts to publish Firefox for Android on Google Play Store.
 
 ### Preparing a release
 
-1. `uv tool run hatch build`
+1. Bump the version in `pyproject.toml`
+1. Run `uv lock`
+1. Update the `CHANGELOG.md` file
+1. Get the changes reviewed and merged
+1. Create a new github release using the version as the tag/release name.
 
 ## What to do when pushapk_scriptworker doesn't work?
 
