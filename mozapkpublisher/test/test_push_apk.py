@@ -143,7 +143,9 @@ def test_main_google(monkeypatch):
             False,
             submit=False,
             sgs_service_account_id=None,
-            sgs_access_token=None
+            sgs_access_token=None,
+            hag_client_id=None,
+            hag_client_secret=None,
         )
 
 
@@ -179,7 +181,9 @@ def test_main_samsung(monkeypatch):
             False,
             submit=True,
             sgs_service_account_id='123',
-            sgs_access_token='456'
+            sgs_access_token='456',
+            hag_client_id=None,
+            hag_client_secret=None,
         )
 
 
@@ -194,6 +198,66 @@ def test_main_samsung_bad_args(monkeypatch):
     ]
 
     for extra in (('--sgs-access-token', '456'), ('--sgs-service-account-id', '123'), ()):
+        test_args = copy.copy(base_test_args)
+        for (pos, extra_arg) in enumerate(extra):
+            test_args.insert(pos + 1, extra_arg)
+
+        monkeypatch.setattr(sys, 'argv', test_args)
+        with pytest.raises(SystemExit) as exception:
+            main()
+
+        assert exception.value.code == 2
+
+
+def test_main_huawei(monkeypatch):
+    file = os.path.join(os.path.dirname(__file__), 'data', 'blob')
+    test_args = [
+        'script',
+        '--store', 'huawei',
+        '--hag-client-id', 'my_client_id',
+        '--hag-client-secret', 'my_client_secret',
+        '--submit',
+        'alpha',
+        file,
+        '--expected-package-name=org.mozilla.fennec_aurora',
+    ]
+
+    with patch.object(mozapkpublisher.push_apk, 'push_apk') as mock_push_apk:
+        monkeypatch.setattr(sys, 'argv', test_args)
+        main()
+
+        mock_push_apk.assert_called_once_with(
+            ANY,
+            None,
+            ['org.mozilla.fennec_aurora'],
+            'alpha',
+            'huawei',
+            None,
+            True,
+            True,
+            False,
+            False,
+            False,
+            False,
+            submit=True,
+            sgs_service_account_id=None,
+            sgs_access_token=None,
+            hag_client_id='my_client_id',
+            hag_client_secret='my_client_secret',
+        )
+
+
+def test_main_huawei_bad_args(monkeypatch):
+    file = os.path.join(os.path.dirname(__file__), 'data', 'blob')
+    base_test_args = [
+        'script',
+        '--store', 'huawei',
+        'alpha',
+        file,
+        '--expected-package-name=org.mozilla.fennec_aurora',
+    ]
+
+    for extra in (('--hag-client-id', 'my_id'), ('--hag-client-secret', 'my_secret'), ()):
         test_args = copy.copy(base_test_args)
         for (pos, extra_arg) in enumerate(extra):
             test_args.insert(pos + 1, extra_arg)

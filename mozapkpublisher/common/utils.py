@@ -25,11 +25,13 @@ def filter_out_identical_values(list_):
 
 
 def add_push_arguments(parser):
-    parser.add_argument('--store', help='Store on which to upload', choices=['google', 'samsung'], default="google")
+    parser.add_argument('--store', help='Store on which to upload', choices=['google', 'samsung', 'huawei'], default="google")
     parser.add_argument('--secret', help='File that contains google credentials (json). This is only required if the store is google.')
     parser.add_argument('--sgs-service-account-id', help='The service account ID for the samsung galaxy store. This is only required if the store is samsung')
     parser.add_argument('--sgs-access-token', help='The access token for the samsung galaxy store. This is only required if the store is samsung')
-    parser.add_argument('--submit', help='Submit the submission for review. This doesn\'t change anything unless the store is samsung', action='store_true')
+    parser.add_argument('--submit', help='Submit the submission for review. This doesn\'t change anything unless the store is samsung or huawei', action='store_true')
+    parser.add_argument('--hag-client-id', help='The client ID for the Huawei AppGallery Connect API. This is only required if the store is huawei')
+    parser.add_argument('--hag-client-secret', help='The client secret for the Huawei AppGallery Connect API. This is only required if the store is huawei')
     parser.add_argument('--do-not-contact-server', action='store_false', dest='contact_server',
                         help='''Prevent any request to reach the APK server. Use this option if
 you want to run the script without any valid credentials nor valid APKs. --credentials must
@@ -54,6 +56,9 @@ def check_push_arguments(parser, config):
     elif config.store == 'samsung':
         if not (config.sgs_service_account_id and config.sgs_access_token):
             parser.error('--sgs-service-account-id and --sgs-access-token are mandatory when using --store=samsung')
+    elif config.store == 'huawei':
+        if not (config.hag_client_id and config.hag_client_secret):
+            parser.error('--hag-client-id and --hag-client-secret are mandatory when using --store=huawei')
 
 
 def metadata_by_package_name(metadata_dict):
