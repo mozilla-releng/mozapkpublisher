@@ -21,7 +21,7 @@ dependencies = [
     "mozilla-version",
     "pyaxmlparser",
     "requests",
-    "pyjwt",
+    "pyjwt[crypto]",
 ]
 
 [dependency-groups]
